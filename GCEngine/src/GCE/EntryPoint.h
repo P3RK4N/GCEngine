@@ -6,7 +6,10 @@ extern GCE::Application* GCE::createApplication();
 
 int main(int argc, char** argv)
 {
-	std::cout << "GigaChad Engine\n";
+	GCE::Log::init();
+	GCE_CORE_WARN("GigaChad Engine");
+	GCE_INFO("Logging started!");
+
 	auto app = GCE::createApplication();
 	app->Run();
 	delete app;
