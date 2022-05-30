@@ -1,3 +1,5 @@
+#include "GCEPCH.h"
+
 #include "Log.h"
 
 namespace GCE

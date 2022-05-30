@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="GCE">
+      <UniqueIdentifier>{D4E9870B-40F3-877C-C96E-9E7C3577937C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GCE\Events">
+      <UniqueIdentifier>{38BF614A-2477-A397-8D7E-7CF379553E88}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\GCE.h" />
+    <ClInclude Include="src\GCE\Application.h">
+      <Filter>GCE</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GCE\Core.h">
+      <Filter>GCE</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GCE\EntryPoint.h">
+      <Filter>GCE</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GCE\Events\ApplicationEvent.h">
+      <Filter>GCE\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GCE\Events\Event.h">
+      <Filter>GCE\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GCE\Events\KeyEvent.h">
+      <Filter>GCE\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GCE\Events\MouseEvent.h">
+      <Filter>GCE\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GCE\Log.h">
+      <Filter>GCE</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GCEPCH.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\GCE\Application.cpp">
+      <Filter>GCE</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GCE\Log.cpp">
+      <Filter>GCE</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GCEPCH.cpp" />
+  </ItemGroup>
+</Project>
