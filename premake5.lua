@@ -5,6 +5,16 @@ workspace "GCEngine"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+-- Included directories relative to root folder
+IncludeDir = {}
+IncludeDir["GLFW"] = "GCEngine/vendor/GLFW/include"
+IncludeDir["Glad"] = "GCEngine/vendor/Glad/include"
+IncludeDir["ImGui"] = "GCEngine/vendor/imgui"
+
+include "GCEngine/vendor/GLFW"
+include "GCEngine/vendor/Glad"
+include "GCEngine/vendor/imgui"
+
 project "GCEngine"
     location "GCEngine"
     kind "SharedLib"
@@ -24,7 +34,18 @@ project "GCEngine"
     includedirs
     {
         "%{prj.name}/vendor/spdlog/include",
-        "%{prj.name}/src"
+        "%{prj.name}/src",
+        "%{IncludeDir.GLFW}",
+        "%{IncludeDir.Glad}",
+        "%{IncludeDir.ImGui}"
+    }
+
+    links
+    {
+        "GLFW",
+        "Glad",
+        "ImGui",
+        "opengl32.lib"
     }
 
     filter "system:windows"
@@ -35,7 +56,8 @@ project "GCEngine"
         defines
         {
             "GCE_PLATFORM_WINDOWS",
-            "GCE_BUILD_DLL"
+            "GCE_BUILD_DLL",
+            "GLFW_INCLUDE_NONE"
         }
 
         postbuildcommands
@@ -45,14 +67,17 @@ project "GCEngine"
 
     filter "configurations:Debug"
         defines "GCE_DEBUG"
+        buildoptions "/MDd"
         symbols "On"
         
     filter "configurations:Release"
         defines "GCE_RELEASE"
+        buildoptions "/MD"
         optimize "On"
 
     filter "configurations:Dist"
         defines "GCE_DIST"
+        buildoptions "/MD"
         optimize "On"
 
 project "Sandbox"
@@ -83,7 +108,7 @@ project "Sandbox"
     filter "system:windows"
         cppdialect "C++20"
         staticruntime "On"
-        systemversion "10.0"
+        systemversion "latest"
 
         defines
         {

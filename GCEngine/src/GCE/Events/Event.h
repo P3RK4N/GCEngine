@@ -39,6 +39,8 @@ namespace GCE
 		friend class EventDispatcher;
 
 	public:
+		bool m_Handled = false;
+
 		virtual EventType getEventType() const = 0;
 		virtual const char* getName() const = 0;
 		virtual int getCategoryFlags() const = 0;
@@ -48,9 +50,6 @@ namespace GCE
 		{
 			return getCategoryFlags() & category;
 		}
-
-	protected:
-		bool m_Handled = false;
 	};
 
 	class EventDispatcher

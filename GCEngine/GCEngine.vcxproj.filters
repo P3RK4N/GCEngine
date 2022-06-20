@@ -7,6 +7,18 @@
     <Filter Include="GCE\Events">
       <UniqueIdentifier>{38BF614A-2477-A397-8D7E-7CF379553E88}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GCE\ImGui">
+      <UniqueIdentifier>{FE6D5548-6AD8-09BF-B316-BB641FC0E713}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{2AC788B4-1694-E3BF-3FAD-D1672BD9184E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform\OpenGL">
+      <UniqueIdentifier>{1E7D2C1D-8A08-9AE1-9319-1DD6FF23F6E1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform\Windows">
+      <UniqueIdentifier>{64FBD71A-50F4-F66C-7926-DCF1657ED678}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GCE.h" />
@@ -31,18 +43,51 @@
     <ClInclude Include="src\GCE\Events\MouseEvent.h">
       <Filter>GCE\Events</Filter>
     </ClInclude>
+    <ClInclude Include="src\GCE\ImGui\ImGuiLayer.h">
+      <Filter>GCE\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GCE\Layer.h">
+      <Filter>GCE</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GCE\LayerStack.h">
+      <Filter>GCE</Filter>
+    </ClInclude>
     <ClInclude Include="src\GCE\Log.h">
       <Filter>GCE</Filter>
     </ClInclude>
+    <ClInclude Include="src\GCE\Window.h">
+      <Filter>GCE</Filter>
+    </ClInclude>
     <ClInclude Include="src\GCEPCH.h" />
+    <ClInclude Include="src\Platform\OpenGL\ImGuiOpenGLRenderer.h">
+      <Filter>Platform\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\Windows\WindowsWindow.h">
+      <Filter>Platform\Windows</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GCE\Application.cpp">
+      <Filter>GCE</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GCE\ImGui\ImGuiLayer.cpp">
+      <Filter>GCE\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GCE\Layer.cpp">
+      <Filter>GCE</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GCE\LayerStack.cpp">
       <Filter>GCE</Filter>
     </ClCompile>
     <ClCompile Include="src\GCE\Log.cpp">
       <Filter>GCE</Filter>
     </ClCompile>
     <ClCompile Include="src\GCEPCH.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\ImGuiOpenGLRenderer.cpp">
+      <Filter>Platform\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp">
+      <Filter>Platform\Windows</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

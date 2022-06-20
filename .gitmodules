@@ -1,3 +1,12 @@
 [submodule "GCEngine/GCEngine\\vendor\\spdlog"]
 	path = GCEngine/GCEngine\\vendor\\spdlog
 	url = https://github.com/gabime/spdlog
+[submodule "GCEngine/vendor/GLFW"]
+	path = GCEngine/vendor/GLFW
+	url = https://github.com/TheCherno/glfw
+[submodule "GCEngine/vendor/imgui"]
+	path = GCEngine/vendor/imgui
+	url = https://github.com/TheCherno/imgui
+[submodule "GCEngine/vendor/imgui_latest"]
+	path = GCEngine/vendor/imgui_latest
+	url = https://github.com/ocornut/imgui
