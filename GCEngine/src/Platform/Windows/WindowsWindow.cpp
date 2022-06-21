@@ -139,6 +139,14 @@ namespace GCE
 			MouseMovedEvent event((float)xPos, (float)yPos);
 			data.eventCallback(event);
 		});
+
+		glfwSetCharCallback(m_Window, [](GLFWwindow* window, unsigned int character)
+		{
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+			KeyTypedEvent event(character);
+			data.eventCallback(event);
+		});
 	}
 
 	void WindowsWindow::Shutdown()

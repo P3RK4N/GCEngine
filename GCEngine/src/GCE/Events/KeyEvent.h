@@ -25,10 +25,7 @@ namespace GCE
 		int m_RepeatCount;
 
 	public:
-		KeyPressedEvent(int keycode, int repeatCount) : KeyEvent(keycode)
-		{
-			m_RepeatCount = repeatCount;
-		}
+		KeyPressedEvent(int keycode, int repeatCount) : KeyEvent(keycode), m_RepeatCount(repeatCount) {}
 
 		inline int getRepeatCount() const { return m_RepeatCount; }
 
@@ -40,6 +37,23 @@ namespace GCE
 		}
 
 		EVENT_CLASS_TYPE(KeyPressed);
+	};
+
+	class GCE_API KeyTypedEvent : public KeyEvent
+	{
+	private:
+
+	public:
+		KeyTypedEvent(int keycode) : KeyEvent(keycode) {}
+
+		std::string ToString() const override
+		{
+			std::stringstream ss;
+			ss << "KeyTypedEvent: " << m_KeyCode;
+			return ss.str();
+		}
+
+		EVENT_CLASS_TYPE(KeyTyped);
 	};
 
 	class GCE_API KeyReleasedEvent : public KeyEvent

@@ -19,6 +19,8 @@ project "GCEngine"
     location "GCEngine"
     kind "SharedLib"
     language "C++"
+    staticruntime "off"
+
     targetdir("bin/" .. outputdir .. "/%{prj.name}")
     objdir("bin-int/" .. outputdir .. "/%{prj.name}")
 
@@ -50,7 +52,6 @@ project "GCEngine"
 
     filter "system:windows"
         cppdialect "C++20"
-        staticruntime "On"
         systemversion "10.0"
     
         defines
@@ -84,6 +85,7 @@ project "Sandbox"
     location "Sandbox"
     kind "ConsoleApp"
     language "C++"
+    staticruntime "off"
 
     targetdir("bin/" .. outputdir .. "/%{prj.name}")
     objdir("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -107,7 +109,6 @@ project "Sandbox"
 
     filter "system:windows"
         cppdialect "C++20"
-        staticruntime "On"
         systemversion "latest"
 
         defines
@@ -117,12 +118,15 @@ project "Sandbox"
 
     filter "configurations:Debug"
         defines "GCE_DEBUG"
+        buildoptions "/MDd"
         symbols "On"
-
+        
     filter "configurations:Release"
         defines "GCE_RELEASE"
+        buildoptions "/MD"
         optimize "On"
 
     filter "configurations:Dist"
         defines "GCE_DIST"
+        buildoptions "/MD"
         optimize "On"

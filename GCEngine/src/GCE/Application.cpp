@@ -35,7 +35,7 @@ namespace GCE
 
 	void Application::pushOverlay(Layer* layer)
 	{
-		m_LayerStack.pushLayer(layer);
+		m_LayerStack.pushOverlay(layer);
 		layer->onAttach();
 	}
 
@@ -46,7 +46,7 @@ namespace GCE
 
 		GCE_CORE_TRACE(e);
 
-		for (auto it = m_LayerStack.end(); it != m_LayerStack.end(); )
+		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 		{
 			(*--it)->onEvent(e);
 			if (e.m_Handled)
