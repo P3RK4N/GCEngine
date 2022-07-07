@@ -5,14 +5,9 @@ class ExampleLayer : public GCE::Layer
 public:
 	ExampleLayer() : Layer("Example") {}
 
-	void onUpdate() override
-	{
-		GCE_INFO("ExampleLayer::Update");
-	}
-
 	void onEvent(GCE::Event& event) override
 	{
-		GCE_TRACE("{0}", event);
+
 	}
 };
 

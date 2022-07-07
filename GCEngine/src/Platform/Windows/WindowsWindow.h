@@ -22,6 +22,8 @@ namespace GCE
 		void setVSync(bool enabled) override;
 		bool isVSync() const override;
 
+		inline void* getNativeWindow() const { return m_Window; }
+
 	private:
 		virtual void Init(const WindowProps& props);
 		virtual void Shutdown();

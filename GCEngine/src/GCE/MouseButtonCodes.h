@@ -1,0 +1,14 @@
+#pragma once
+
+#define GCE_MOUSE_BUTTON_1         0
+#define GCE_MOUSE_BUTTON_2         1
+#define GCE_MOUSE_BUTTON_3         2
+#define GCE_MOUSE_BUTTON_4         3
+#define GCE_MOUSE_BUTTON_5         4
+#define GCE_MOUSE_BUTTON_6         5
+#define GCE_MOUSE_BUTTON_7         6
+#define GCE_MOUSE_BUTTON_8         7
+#define GCE_MOUSE_BUTTON_LAST      GCE_MOUSE_BUTTON_8
+#define GCE_MOUSE_BUTTON_LEFT      GCE_MOUSE_BUTTON_1
+#define GCE_MOUSE_BUTTON_RIGHT     GCE_MOUSE_BUTTON_2
+#define GCE_MOUSE_BUTTON_MIDDLE    GCE_MOUSE_BUTTON_3

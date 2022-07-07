@@ -2,6 +2,7 @@
 #include "Application.h"
 
 #include "GCE/Events/ApplicationEvent.h"
+#include "GCE/Input.h"
 
 #include "glad/glad.h"
 

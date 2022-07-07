@@ -10,6 +10,7 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "GCEngine/vendor/GLFW/include"
 IncludeDir["Glad"] = "GCEngine/vendor/Glad/include"
 IncludeDir["ImGui"] = "GCEngine/vendor/imgui"
+IncludeDir["glm"] = "GCEngine/vendor/glm"
 
 include "GCEngine/vendor/GLFW"
 include "GCEngine/vendor/Glad"
@@ -31,6 +32,8 @@ project "GCEngine"
     {
         "%{prj.name}/src/**.h",
         "%{prj.name}/src/**.cpp",
+        "%{prj.name}/vendor/glm/glm/**.hpp",
+        "%{prj.name}/vendor/glm/glm/**.inl"
     }
 
     includedirs
@@ -39,7 +42,8 @@ project "GCEngine"
         "%{prj.name}/src",
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.Glad}",
-        "%{IncludeDir.ImGui}"
+        "%{IncludeDir.ImGui}",
+        "%{IncludeDir.glm}"
     }
 
     links
@@ -99,7 +103,8 @@ project "Sandbox"
     includedirs
     {
         "GCEngine/vendor/spdlog/include",
-        "GCEngine/src"
+        "GCEngine/src",
+        "%{IncludeDir.glm}"
     }
 
     links

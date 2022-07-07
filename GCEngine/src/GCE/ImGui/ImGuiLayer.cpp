@@ -149,8 +149,4 @@ namespace GCE
 
 		return false;
 	}
-
-	
-
-
 }
