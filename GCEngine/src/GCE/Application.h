@@ -6,6 +6,9 @@
 #include "GCE/LayerStack.h"
 #include "GCE/Events/Event.h"
 #include "GCE/Events/ApplicationEvent.h"
+#include "GCE/ImGui/ImGuiLayer.h"
+#include "GCE/Renderer/Shader.h"
+#include "GCE/Renderer/Buffer.h"
 
 namespace GCE
 {
@@ -29,10 +32,17 @@ namespace GCE
 		bool onWindowClose(WindowCloseEvent& e);
 
 		std::unique_ptr<Window> m_Window;
+		ImGuiLayer* m_ImGuiLayer;
+
 		bool m_Running = true;
 		LayerStack m_LayerStack;
 
 		static Application* s_Instance;
+
+		unsigned int m_VertexArray;
+		std::unique_ptr<Shader> m_Shader;
+		std::unique_ptr<VertexBuffer> m_VertexBuffer;
+		std::unique_ptr<IndexBuffer> m_IndexBuffer;
 	};
 
 	Application* createApplication();

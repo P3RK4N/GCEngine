@@ -1,8 +1,10 @@
 #pragma once
 
 #include "GCE/Window.h"
+#include "GCE/Renderer/GraphicsContext.h"
 
 #include <GLFW/glfw3.h>
+
 
 namespace GCE
 {
@@ -25,10 +27,11 @@ namespace GCE
 		inline void* getNativeWindow() const { return m_Window; }
 
 	private:
-		virtual void Init(const WindowProps& props);
-		virtual void Shutdown();
+		virtual void init(const WindowProps& props);
+		virtual void shutdown();
 
 		GLFWwindow* m_Window;
+		GraphicsContext* m_Context;
 
 		struct WindowData
 		{

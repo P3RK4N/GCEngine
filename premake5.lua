@@ -18,9 +18,10 @@ include "GCEngine/vendor/imgui"
 
 project "GCEngine"
     location "GCEngine"
-    kind "SharedLib"
+    kind "StaticLib"
     language "C++"
-    staticruntime "off"
+    cppdialect "C++20"
+    staticruntime "on"
 
     targetdir("bin/" .. outputdir .. "/%{prj.name}")
     objdir("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -54,10 +55,13 @@ project "GCEngine"
         "opengl32.lib"
     }
 
+    defines
+    {
+        "IMGUI_API=__declspec(dllexport)"
+    }
+
     filter "system:windows"
-        cppdialect "C++20"
-        systemversion "10.0"
-    
+        systemversion "latest"
         defines
         {
             "GCE_PLATFORM_WINDOWS",
@@ -65,31 +69,27 @@ project "GCEngine"
             "GLFW_INCLUDE_NONE"
         }
 
-        postbuildcommands
-        {
-            ("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox/")
-        }
-
     filter "configurations:Debug"
         defines "GCE_DEBUG"
         buildoptions "/MDd"
-        symbols "On"
+        symbols "on"
         
     filter "configurations:Release"
         defines "GCE_RELEASE"
         buildoptions "/MD"
-        optimize "On"
+        optimize "on"
 
     filter "configurations:Dist"
         defines "GCE_DIST"
         buildoptions "/MD"
-        optimize "On"
+        optimize "on"
 
 project "Sandbox"
     location "Sandbox"
     kind "ConsoleApp"
     language "C++"
-    staticruntime "off"
+    cppdialect "C++20"
+    staticruntime "on"
 
     targetdir("bin/" .. outputdir .. "/%{prj.name}")
     objdir("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -112,10 +112,13 @@ project "Sandbox"
         "GCEngine"
     }
 
-    filter "system:windows"
-        cppdialect "C++20"
-        systemversion "latest"
+    defines
+    {
+        "IMGUI_API=__declspec(dllimport)"
+    }
 
+    filter "system:windows"
+        systemversion "latest"
         defines
         {
             "GCE_PLATFORM_WINDOWS"
@@ -124,14 +127,14 @@ project "Sandbox"
     filter "configurations:Debug"
         defines "GCE_DEBUG"
         buildoptions "/MDd"
-        symbols "On"
+        symbols "on"
         
     filter "configurations:Release"
         defines "GCE_RELEASE"
         buildoptions "/MD"
-        optimize "On"
+        optimize "on"
 
     filter "configurations:Dist"
         defines "GCE_DIST"
         buildoptions "/MD"
-        optimize "On"
+        optimize "on"

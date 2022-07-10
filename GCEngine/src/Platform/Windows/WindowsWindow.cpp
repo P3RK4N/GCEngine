@@ -5,8 +5,9 @@
 #include "GCE/Events/MouseEvent.h"
 #include "GCE/Events/KeyEvent.h"
 
+#include "Platform/OpenGL/OpenGLContext.h"
+
 //#include "GCE/Core.h"
-#include "glad/glad.h"
 
 namespace GCE
 {
@@ -24,15 +25,15 @@ namespace GCE
 
 	WindowsWindow::WindowsWindow(const WindowProps& props)
 	{
-		Init(props);
+		init(props);
 	}
 
 	WindowsWindow::~WindowsWindow()
 	{
-		Shutdown();
+		shutdown();
 	}
 
-	void WindowsWindow::Init(const WindowProps& props)
+	void WindowsWindow::init(const WindowProps& props)
 	{
 		m_Data.title = props.title;
 		m_Data.width = props.width;
@@ -51,9 +52,10 @@ namespace GCE
 		}
 
 		m_Window = glfwCreateWindow((int)props.width, (int)props.height, m_Data.title.c_str(), nullptr, nullptr);
-		glfwMakeContextCurrent(m_Window);
-		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-		GCE_CORE_ASSERT(status, "Glad failed to load!");
+
+		m_Context = new OpenGLContext(m_Window);
+		m_Context->init();
+		
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 		setVSync(true);
 
@@ -149,7 +151,7 @@ namespace GCE
 		});
 	}
 
-	void WindowsWindow::Shutdown()
+	void WindowsWindow::shutdown()
 	{
 		glfwDestroyWindow(m_Window);
 	}
@@ -157,7 +159,7 @@ namespace GCE
 	void WindowsWindow::onUpdate()
 	{
 		glfwPollEvents();
-		glfwSwapBuffers(m_Window);
+		m_Context->swapBuffers();
 	}
 
 	void WindowsWindow::setVSync(bool enabled)

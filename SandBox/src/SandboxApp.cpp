@@ -17,7 +17,6 @@ public:
 	SandBox()
 	{
 		pushLayer(new ExampleLayer());
-		pushOverlay(new GCE::ImGuiLayer());
 	}
 
 	~SandBox()

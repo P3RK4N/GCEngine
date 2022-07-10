@@ -1,10 +1,14 @@
 #pragma once
 
 #ifdef GCE_PLATFORM_WINDOWS
-	#ifdef GCE_BUILD_DLL
-		#define GCE_API __declspec(dllexport)
+	#if GCE_DYNAMIC_LINK
+		#ifdef GCE_BUILD_DLL
+			#define GCE_API __declspec(dllexport)
+		#else 
+			#define GCE_API __declspec(dllimport)
+		#endif
 	#else 
-		#define GCE_API __declspec(dllimport)
+		#define GCE_API
 	#endif
 #else
 	#error GC Engine only supports windows!
