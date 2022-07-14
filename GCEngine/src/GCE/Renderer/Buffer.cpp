@@ -10,8 +10,8 @@ namespace GCE
 	{
 		switch (Renderer::getAPI())
 		{
-		case RendererAPI::None:		GCE_CORE_ASSERT(false, "Renderer API none is not supported"); return nullptr;
-		case RendererAPI::OpenGL:	return new OpenGLVertexBuffer(vertices, size);
+		case RendererAPI::API::None:		GCE_CORE_ASSERT(false, "Renderer API none is not supported"); return nullptr;
+		case RendererAPI::API::OpenGL:	return new OpenGLVertexBuffer(vertices, size);
 		}
 
 		GCE_CORE_ASSERT(false, "Unknown RendererAPI");
@@ -22,8 +22,8 @@ namespace GCE
 	{
 		switch (Renderer::getAPI())
 		{
-		case RendererAPI::None:		GCE_CORE_ASSERT(false, "Renderer API none is not supported"); return nullptr;
-		case RendererAPI::OpenGL:	return new OpenGLIndexBuffer(indices, size);
+		case RendererAPI::API::None:		GCE_CORE_ASSERT(false, "Renderer API none is not supported"); return nullptr;
+		case RendererAPI::API::OpenGL:	return new OpenGLIndexBuffer(indices, size);
 		}
 
 		GCE_CORE_ASSERT(false, "Unknown RendererAPI");

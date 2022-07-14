@@ -1,19 +1,19 @@
 #pragma once
 
 #include <string>
+#include <glm/glm.hpp>
 
 namespace GCE
 {
 	class Shader
 	{
 	public:
-		Shader(const std::string& vertexSrc, const std::string& fragmentSrc);
-		~Shader();
+		virtual ~Shader() = default;
 
-		void bind() const;
-		void unbind() const;
+		virtual void bind() const = 0;
+		virtual void unbind() const = 0;
 
-	private:
-		unsigned int m_RendererID;
+	public:
+		static Shader* create(const std::string& vertexSrc, const std::string& fragmentSrc);
 	};
 }

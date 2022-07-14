@@ -1,19 +1,32 @@
 #pragma once
 
+#include "GCE/Renderer/RenderCommand.h"
+#include "GCE/Renderer/OrthographicCamera.h"
+#include "GCE/Renderer/Shader.h"
+
+//Projection * View * Transform
+//Transform = translationMat * scaleMat
+
 namespace GCE
 {
-	enum class RendererAPI
-	{
-		None = 0,
-		OpenGL = 1
-	};
-
 	class Renderer
 	{
 	public:
-		inline static RendererAPI getAPI() { return s_RendererAPI; }
+		static void beginScene(OrthographicCamera& camera);
+		static void endScene();
+
+		static void init();
+
+		static void submit(const Ref<VertexArray>& vertexArray, const Ref<Shader>& shader, const glm::mat4& transformMatrix = glm::mat4(1.0f));
+
+		inline static RendererAPI::API getAPI() { return RendererAPI::getAPI(); }
 
 	private:
-		static RendererAPI s_RendererAPI;
+		struct SceneData
+		{
+			glm::mat4 viewProjectionMatrix;
+		};
+
+		static SceneData* m_SceneData;
 	};
 }

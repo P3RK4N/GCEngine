@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GCE/Core.h"
+#include "GCE/Core/Timestep.h"
 #include "GCE/Events/Event.h"
 
 namespace GCE
@@ -13,7 +14,7 @@ namespace GCE
 
 		virtual void onAttach() {}
 		virtual void onDetach() {}
-		virtual void onUpdate() {}
+		virtual void onUpdate(Timestep ts) {}
 		virtual void onImGuiRender() {}
 		virtual void onEvent(Event& event) {}
 
