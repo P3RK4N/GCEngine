@@ -1,7 +1,7 @@
 #include "GCEPCH.h"
-#include "VertexArray.h"
+#include "GCE/Renderer/VertexArray.h"
 
-#include "Renderer.h"
+#include "GCE/Renderer/Renderer.h"
 #include "Platform/OpenGL/OpenGLVertexArray.h"
 
 namespace GCE

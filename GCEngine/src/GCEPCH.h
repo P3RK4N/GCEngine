@@ -8,11 +8,12 @@
 
 #include <string>
 #include <sstream>
+#include <array>
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
 
-#include "GCE/Log.h"
+#include "GCE/Core/Log.h"
 
 #ifdef GCE_PLATFORM_WINDOWS
 	#include <Windows.h>

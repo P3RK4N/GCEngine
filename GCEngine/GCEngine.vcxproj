@@ -141,31 +141,32 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\GCE.h" />
-    <ClInclude Include="src\GCE\Application.h" />
-    <ClInclude Include="src\GCE\Core.h" />
+    <ClInclude Include="src\GCE\Core\Application.h" />
+    <ClInclude Include="src\GCE\Core\Core.h" />
+    <ClInclude Include="src\GCE\Core\EntryPoint.h" />
+    <ClInclude Include="src\GCE\Core\Input.h" />
+    <ClInclude Include="src\GCE\Core\KeyCodes.h" />
+    <ClInclude Include="src\GCE\Core\Layer.h" />
+    <ClInclude Include="src\GCE\Core\LayerStack.h" />
+    <ClInclude Include="src\GCE\Core\Log.h" />
+    <ClInclude Include="src\GCE\Core\MouseButtonCodes.h" />
     <ClInclude Include="src\GCE\Core\Timestep.h" />
-    <ClInclude Include="src\GCE\EntryPoint.h" />
+    <ClInclude Include="src\GCE\Core\Window.h" />
     <ClInclude Include="src\GCE\Events\ApplicationEvent.h" />
     <ClInclude Include="src\GCE\Events\Event.h" />
     <ClInclude Include="src\GCE\Events\KeyEvent.h" />
     <ClInclude Include="src\GCE\Events\MouseEvent.h" />
     <ClInclude Include="src\GCE\ImGui\ImGuiLayer.h" />
-    <ClInclude Include="src\GCE\Input.h" />
-    <ClInclude Include="src\GCE\KeyCodes.h" />
-    <ClInclude Include="src\GCE\Layer.h" />
-    <ClInclude Include="src\GCE\LayerStack.h" />
-    <ClInclude Include="src\GCE\Log.h" />
-    <ClInclude Include="src\GCE\MouseButtonCodes.h" />
     <ClInclude Include="src\GCE\Renderer\Buffer.h" />
     <ClInclude Include="src\GCE\Renderer\GraphicsContext.h" />
     <ClInclude Include="src\GCE\Renderer\OrthographicCamera.h" />
+    <ClInclude Include="src\GCE\Renderer\OrthographicCameraController.h" />
     <ClInclude Include="src\GCE\Renderer\RenderCommand.h" />
     <ClInclude Include="src\GCE\Renderer\Renderer.h" />
     <ClInclude Include="src\GCE\Renderer\RendererAPI.h" />
     <ClInclude Include="src\GCE\Renderer\Shader.h" />
     <ClInclude Include="src\GCE\Renderer\Texture.h" />
     <ClInclude Include="src\GCE\Renderer\VertexArray.h" />
-    <ClInclude Include="src\GCE\Window.h" />
     <ClInclude Include="src\GCEPCH.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
@@ -593,14 +594,15 @@
     <ClInclude Include="vendor\stb_image\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\GCE\Application.cpp" />
+    <ClCompile Include="src\GCE\Core\Application.cpp" />
+    <ClCompile Include="src\GCE\Core\Layer.cpp" />
+    <ClCompile Include="src\GCE\Core\LayerStack.cpp" />
+    <ClCompile Include="src\GCE\Core\Log.cpp" />
     <ClCompile Include="src\GCE\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\GCE\ImGui\ImGuiLayer.cpp" />
-    <ClCompile Include="src\GCE\Layer.cpp" />
-    <ClCompile Include="src\GCE\LayerStack.cpp" />
-    <ClCompile Include="src\GCE\Log.cpp" />
     <ClCompile Include="src\GCE\Renderer\Buffer.cpp" />
     <ClCompile Include="src\GCE\Renderer\OrthographicCamera.cpp" />
+    <ClCompile Include="src\GCE\Renderer\OrthographicCameraController.cpp" />
     <ClCompile Include="src\GCE\Renderer\RenderCommand.cpp" />
     <ClCompile Include="src\GCE\Renderer\Renderer.cpp" />
     <ClCompile Include="src\GCE\Renderer\RendererAPI.cpp" />

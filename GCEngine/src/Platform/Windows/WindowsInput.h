@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GCE/Input.h"
+#include "GCE/Core/Input.h"
 
 namespace GCE
 {

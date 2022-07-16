@@ -27,6 +27,11 @@ namespace GCE
 			s_RendererAPI->drawIndexed(vertexArray);
 		}
 
+		inline static void setViewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
+		{
+			s_RendererAPI->setViewport(x, y, width, height);
+		}
+
 	private:
 		static RendererAPI* s_RendererAPI;
 	};

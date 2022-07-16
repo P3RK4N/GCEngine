@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Event.h"
+#include "GCE/Events/Event.h"
 
 namespace GCE
 {

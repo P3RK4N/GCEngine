@@ -2,16 +2,17 @@
 
 //For use by GCE applications
 
-#include "GCE/Application.h"
-#include "GCE/Log.h"
-#include "GCE/Layer.h"
+#include "GCE/Core/Application.h"
+#include "GCE/Core/Log.h"
+#include "GCE/Core/Layer.h"
 
-#include "GCE/Input.h"
-#include "GCE/KeyCodes.h"
-#include "GCE/MouseButtonCodes.h"
+#include "GCE/Core/Input.h"
+#include "GCE/Core/KeyCodes.h"
+#include "GCE/Core/MouseButtonCodes.h"
 
 #include "GCE/ImGui/ImGuiLayer.h"
 
+#include "GCE/Renderer/OrthographicCameraController.h"
 
 //RENDERER----------------------------------------
 #include "GCE/Renderer/Renderer.h"
@@ -26,5 +27,5 @@
 
 
 //ENTRY POINT----------------------------------------
-#include "GCE/EntryPoint.h"
+#include "GCE/Core/EntryPoint.h"
 //---------------------------------------------------

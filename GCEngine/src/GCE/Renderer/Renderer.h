@@ -16,6 +16,7 @@ namespace GCE
 		static void endScene();
 
 		static void init();
+		static void onWindowResize(unsigned int width, unsigned int height);
 
 		static void submit(const Ref<VertexArray>& vertexArray, const Ref<Shader>& shader, const glm::mat4& transformMatrix = glm::mat4(1.0f));
 

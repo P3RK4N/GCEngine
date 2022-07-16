@@ -1,5 +1,5 @@
 #include "GCEPCH.h"
-#include "WindowsWindow.h"
+#include "Platform/Windows/WindowsWindow.h"
 
 #include "GCE/Events/ApplicationEvent.h"
 #include "GCE/Events/MouseEvent.h"

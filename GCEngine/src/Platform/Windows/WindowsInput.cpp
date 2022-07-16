@@ -1,8 +1,8 @@
 #include "GCEPCH.h"
+#include "Platform/Windows/WindowsInput.h" 
 
-#include "WindowsInput.h" 
+#include "GCE/Core/Application.h"
 
-#include "GCE/Application.h"
 #include <GLFW/glfw3.h>
 
 namespace GCE

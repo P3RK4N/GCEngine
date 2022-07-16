@@ -22,6 +22,11 @@ namespace GCE
 		RenderCommand::init();
 	}
 
+	void Renderer::onWindowResize(unsigned int width, unsigned int height)
+	{
+		RenderCommand::setViewport(0, 0, width, height);
+	}
+
 	void Renderer::submit(const Ref<VertexArray>& vertexArray, const Ref<Shader>& shader, const glm::mat4& transformMatrix)
 	{
 		shader->bind();

@@ -1,8 +1,7 @@
 #pragma once
-
 #include "GCEPCH.h"
 
-#include "GCE/Core.h"
+#include "GCE/Core/Core.h"
 
 namespace GCE
 {
