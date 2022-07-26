@@ -19,6 +19,8 @@ namespace GCE
 	OpenGLShader::OpenGLShader(const std::string& shaderName, const std::string& vertexSrc, const std::string& fragmentSrc) :
 		m_Name(shaderName)
 	{
+		GCE_PROFILE_FUNCTION();
+
 		std::unordered_map<GLenum, std::string> shaderSrc;
 		shaderSrc[GL_VERTEX_SHADER] = vertexSrc;
 		shaderSrc[GL_FRAGMENT_SHADER] = fragmentSrc;
@@ -27,6 +29,8 @@ namespace GCE
 
 	OpenGLShader::OpenGLShader(const std::string& path)
 	{
+		GCE_PROFILE_FUNCTION();
+
 		std::string source = readFile(path);
 		auto shaderSrc = preProcess(source);
 		compile(shaderSrc);
@@ -40,24 +44,76 @@ namespace GCE
 
 	OpenGLShader::~OpenGLShader()
 	{
+		GCE_PROFILE_FUNCTION();
+
 		glDeleteProgram(m_RendererID);
 	}
 
 	void OpenGLShader::bind() const
 	{
+		GCE_PROFILE_FUNCTION();
+
 		glUseProgram(m_RendererID);
 	}
 
 
 	void OpenGLShader::unbind() const
 	{
+		GCE_PROFILE_FUNCTION();
+
 		glUseProgram(0);
+	}
+
+	void OpenGLShader::setMat4(const std::string& name, const glm::mat4& value)
+	{
+		GCE_PROFILE_FUNCTION();
+
+		uploadUniformMat4(name, value);
+	}
+
+	void OpenGLShader::setFloat(const std::string& name, float value)
+	{
+		GCE_PROFILE_FUNCTION();
+
+		uploadUniformFloat(name, value);
+	}
+
+	void OpenGLShader::setFloat3(const std::string& name, const glm::vec3& value)
+	{
+		GCE_PROFILE_FUNCTION();
+
+		uploadUniformFloat3(name, value);
+	}
+
+	void OpenGLShader::setFloat4(const std::string& name, const glm::vec4& value)
+	{
+		GCE_PROFILE_FUNCTION();
+
+		uploadUniformFloat4(name, value);
+	}
+
+	void OpenGLShader::setInt(const std::string& name, int value)
+	{
+		GCE_PROFILE_FUNCTION();
+
+		uploadUniformInt(name, value);
+	}
+
+	void OpenGLShader::setIntArray(const std::string& name, int* values, unsigned int count)
+	{
+		uploadUniformIntArray(name, values, count);
 	}
 
 	void OpenGLShader::uploadUniformInt(const std::string& name, int value)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
 		glUniform1i(location, value);
+	}
+
+	void OpenGLShader::uploadUniformIntArray(const std::string& name, int* values, unsigned int count)
+	{
+		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		glUniform1iv(location, count, values);
 	}
 
 	void OpenGLShader::uploadUniformFloat(const std::string& name, float value)
@@ -98,6 +154,8 @@ namespace GCE
 
 	std::string OpenGLShader::readFile(const std::string& path)
 	{
+		GCE_PROFILE_FUNCTION();
+
 		std::string result;
 		std::ifstream in(path, std::ios::in | std::ios::binary);
 		if (in)
@@ -117,6 +175,8 @@ namespace GCE
 
 	std::unordered_map<GLenum, std::string> OpenGLShader::preProcess(const std::string& source)
 	{
+		GCE_PROFILE_FUNCTION();
+
 		std::unordered_map<GLenum, std::string> shaderSrc;
 
 		const char* typeToken = "#type";
@@ -141,6 +201,8 @@ namespace GCE
 
 	void OpenGLShader::compile(const std::unordered_map<GLenum, std::string>& shaderSrc)
 	{
+		GCE_PROFILE_FUNCTION();
+
 		GLuint program = glCreateProgram();
 		GCE_CORE_ASSERT(shaderSrc.size() <= 2, "We only support 2 shaders");
 		std::array<GLenum, 2> glShaderIDs;

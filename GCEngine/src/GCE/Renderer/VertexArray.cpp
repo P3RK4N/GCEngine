@@ -6,12 +6,12 @@
 
 namespace GCE
 {
-	VertexArray* VertexArray::create()
+	Ref<VertexArray> VertexArray::create()
 	{
 		switch (Renderer::getAPI())
 		{
 			case RendererAPI::API::None:		GCE_CORE_ASSERT(false, "RendererAPI::None is currently not supported"); return nullptr;
-			case RendererAPI::API::OpenGL:		return new OpenGLVertexArray();
+			case RendererAPI::API::OpenGL:		return createRef<OpenGLVertexArray>();
 		}
 
 		GCE_CORE_ASSERT(false, "Unknown RenderAPI!");

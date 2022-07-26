@@ -14,7 +14,7 @@ namespace GCE
 		switch (Renderer::getAPI())
 		{
 			case RendererAPI::API::None:		GCE_CORE_ASSERT(false, "RendererAPI::None is currently not supported");
-			case RendererAPI::API::OpenGL:		return std::make_shared<OpenGLShader>(shaderName, vertexSrc, fragmentSrc);
+			case RendererAPI::API::OpenGL:		return createRef<OpenGLShader>(shaderName, vertexSrc, fragmentSrc);
 		}
 
 		GCE_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -26,7 +26,7 @@ namespace GCE
 		switch (Renderer::getAPI())
 		{
 		case RendererAPI::API::None:		GCE_CORE_ASSERT(false, "RendererAPI::None is currently not supported");
-		case RendererAPI::API::OpenGL:		return std::make_shared<OpenGLShader>(path);
+		case RendererAPI::API::OpenGL:		return createRef<OpenGLShader>(path);
 		}
 
 		GCE_CORE_ASSERT(false, "Unknown RendererAPI!");

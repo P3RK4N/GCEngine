@@ -14,6 +14,6 @@ namespace GCE
 
 		virtual void setViewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height) override;
 
-		virtual void drawIndexed(const Ref<VertexArray>& vertexArray) override;
+		virtual void drawIndexed(const Ref<VertexArray>& vertexArray, unsigned int indexCount = 0) override;
 	};
 }

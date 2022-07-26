@@ -17,6 +17,8 @@ namespace GCE
 
 	void OrthographicCameraController::onUpdate(Timestep ts)
 	{
+		GCE_PROFILE_FUNCTION();
+
 		//POSITION
 		if (Input::isKeyPressed(GCE_KEY_A))
 			m_Camera.setPosition(m_Camera.getPosition() - glm::vec3(m_CameraMoveSpeed * ts * m_ZoomLevel, 0.0f, 0.0f));
@@ -39,13 +41,23 @@ namespace GCE
 
 	void OrthographicCameraController::onEvent(Event& e)
 	{
+		GCE_PROFILE_FUNCTION();
+
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<MouseScrolledEvent>(GCE_BIND_EVENT_FN(OrthographicCameraController::onMouseScrolled));
 		dispatcher.Dispatch<WindowResizeEvent>(GCE_BIND_EVENT_FN(OrthographicCameraController::onWindowResized));
 	}
 
+	void OrthographicCameraController::onResize(float width, float height)
+	{
+		m_AspectRatio = width / height;
+		m_Camera.setProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+	}
+
 	bool OrthographicCameraController::onMouseScrolled(MouseScrolledEvent& e)
 	{
+		GCE_PROFILE_FUNCTION();
+
 		m_ZoomLevel = std::max(m_ZoomLevel - e.getYOffset() * m_ZoomSpeed, 0.25f);
 		m_Camera.setProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
 		return false;
@@ -53,8 +65,9 @@ namespace GCE
 
 	bool OrthographicCameraController::onWindowResized(WindowResizeEvent& e)
 	{
-		m_AspectRatio = (float)e.getWidth() / (float)e.getHeight();
-		m_Camera.setProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+		GCE_PROFILE_FUNCTION();
+
+		onResize((float)e.getWidth(), (float)e.getHeight());
 		return false;
 	}
 

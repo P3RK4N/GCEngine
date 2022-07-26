@@ -22,9 +22,9 @@ namespace GCE
 			s_RendererAPI->setClearColor(color);
 		}
 
-		inline static void drawIndexed(const Ref<VertexArray>& vertexArray)
+		inline static void drawIndexed(const Ref<VertexArray>& vertexArray, unsigned int indexCount = 0)
 		{
-			s_RendererAPI->drawIndexed(vertexArray);
+			s_RendererAPI->drawIndexed(vertexArray, indexCount);
 		}
 
 		inline static void setViewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height)

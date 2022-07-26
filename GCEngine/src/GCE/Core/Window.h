@@ -10,7 +10,7 @@ namespace GCE
 		unsigned int width;
 		unsigned int height;
 
-		WindowProps(const std::string& title = "GigaChad Engine", 
+		WindowProps(const std::string& title = "GCEngine", 
 					unsigned int width = 1280,
 					unsigned int height = 720)
 			: title(title), width(width), height(height) {}
@@ -36,6 +36,6 @@ namespace GCE
 
 		virtual void* getNativeWindow() const = 0;
 
-		static Window* Create(const WindowProps& props = WindowProps());
+		static Scope<Window> Create(const WindowProps& props = WindowProps());
 	};
 }

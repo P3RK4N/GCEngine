@@ -14,6 +14,7 @@
 #include <unordered_set>
 
 #include "GCE/Core/Log.h"
+#include "GCE/Debug/Instrumentor.h"
 
 #ifdef GCE_PLATFORM_WINDOWS
 	#include <Windows.h>

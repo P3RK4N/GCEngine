@@ -18,23 +18,29 @@ namespace GCE
 		GCE_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
 	}
 
-	Window* Window::Create(const WindowProps& props)
+	Scope<Window> Window::Create(const WindowProps& props)
 	{
-		return new WindowsWindow(props);
+		return createScope<WindowsWindow>(props);
 	}
 
 	WindowsWindow::WindowsWindow(const WindowProps& props)
 	{
+		GCE_PROFILE_FUNCTION();
+
 		init(props);
 	}
 
 	WindowsWindow::~WindowsWindow()
 	{
+		GCE_PROFILE_FUNCTION();
+
 		shutdown();
 	}
 
 	void WindowsWindow::init(const WindowProps& props)
 	{
+		GCE_PROFILE_FUNCTION();
+
 		m_Data.title = props.title;
 		m_Data.width = props.width;
 		m_Data.height = props.height;
@@ -153,17 +159,23 @@ namespace GCE
 
 	void WindowsWindow::shutdown()
 	{
+		GCE_PROFILE_FUNCTION();
+
 		glfwDestroyWindow(m_Window);
 	}
 
 	void WindowsWindow::onUpdate()
 	{
+		GCE_PROFILE_FUNCTION();
+
 		glfwPollEvents();
 		m_Context->swapBuffers();
 	}
 
 	void WindowsWindow::setVSync(bool enabled)
 	{
+		GCE_PROFILE_FUNCTION();
+
 		glfwSwapInterval((int)enabled);
 
 		m_Data.VSync = enabled;

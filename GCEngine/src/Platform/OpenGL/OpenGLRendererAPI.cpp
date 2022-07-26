@@ -8,8 +8,12 @@ namespace GCE
 
 	void OpenGLRendererAPI::init()
 	{
+		GCE_PROFILE_FUNCTION();
+
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glEnable(GL_DEPTH_TEST);
 	}
 
 	void OpenGLRendererAPI::clear()
@@ -27,8 +31,9 @@ namespace GCE
 		glViewport(x, y, width, height);
 	}
 
-	void OpenGLRendererAPI::drawIndexed(const GCE::Ref<VertexArray>& vertexArray)
+	void OpenGLRendererAPI::drawIndexed(const GCE::Ref<VertexArray>& vertexArray, unsigned int indexCount)
 	{
-		glDrawElements(GL_TRIANGLES, vertexArray->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+		unsigned int count = indexCount ? vertexArray->getIndexBuffer()->getCount() : indexCount;
+		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 	}
 }

@@ -1,7 +1,8 @@
 workspace "GCEngine"
     architecture "x64"
-    startproject "Sandbox"
+    startproject "GCEditor"
     configurations { "Debug", "Release", "Dist" }
+    flags { "MultiProcessorCompile" }
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
@@ -13,9 +14,11 @@ IncludeDir["ImGui"] = "GCEngine/vendor/imgui"
 IncludeDir["glm"] = "GCEngine/vendor/glm"
 IncludeDir["stb_image"] = "GCEngine/vendor/stb_image"
 
-include "GCEngine/vendor/GLFW"
-include "GCEngine/vendor/Glad"
-include "GCEngine/vendor/imgui"
+group "Dependencies"
+    include "GCEngine/vendor/GLFW"
+    include "GCEngine/vendor/Glad"
+    include "GCEngine/vendor/imgui"
+group ""
 
 project "GCEngine"
     location "GCEngine"
@@ -101,6 +104,60 @@ project "Sandbox"
         "%{prj.name}/src/**.cpp"
     }
 
+    includedirs
+    {
+        "GCEngine/vendor/spdlog/include",
+        "GCEngine/src",
+        "%{IncludeDir.glm}",
+        "%{IncludeDir.ImGui}"
+    }
+
+    links
+    {
+        "GCEngine"
+    }
+
+    defines
+    {
+        "IMGUI_API=__declspec(dllimport)"
+    }
+
+    filter "system:windows"
+        systemversion "latest"
+        defines
+        {
+            "GCE_PLATFORM_WINDOWS"
+        }
+
+    filter "configurations:Debug"
+        defines "GCE_DEBUG"
+        symbols "on"
+        
+    filter "configurations:Release"
+        defines "GCE_RELEASE"
+        optimize "on"
+
+    filter "configurations:Dist"
+        defines "GCE_DIST"
+        optimize "on"
+
+
+project "GCEditor"
+    location "GCEditor"
+    kind "ConsoleApp"
+    language "C++"
+    cppdialect "C++20"
+    staticruntime "on"
+    
+    targetdir("bin/" .. outputdir .. "/%{prj.name}")
+    objdir("bin-int/" .. outputdir .. "/%{prj.name}")
+    
+    files
+    {
+        "%{prj.name}/src/**.h",
+        "%{prj.name}/src/**.cpp"
+    }
+    
     includedirs
     {
         "GCEngine/vendor/spdlog/include",

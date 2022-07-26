@@ -1,7 +1,7 @@
 #include "GCEPCH.h"
 #include "GCE/Renderer/Renderer.h"
 
-#include "Platform/OpenGL/OpenGLShader.h"
+#include "GCE/Renderer/Renderer2D.h"
 
 namespace GCE
 {
@@ -19,7 +19,10 @@ namespace GCE
 
 	void Renderer::init()
 	{
+		GCE_PROFILE_FUNCTION();
+
 		RenderCommand::init();
+		Renderer2D::init();
 	}
 
 	void Renderer::onWindowResize(unsigned int width, unsigned int height)
@@ -30,8 +33,8 @@ namespace GCE
 	void Renderer::submit(const Ref<VertexArray>& vertexArray, const Ref<Shader>& shader, const glm::mat4& transformMatrix)
 	{
 		shader->bind();
-		std::dynamic_pointer_cast<OpenGLShader>(shader)->uploadUniformMat4("u_TransformMatrix", transformMatrix);
-		std::dynamic_pointer_cast<OpenGLShader>(shader)->uploadUniformMat4("u_ViewProjectionMatrix", m_SceneData->viewProjectionMatrix);
+		shader->setMat4("u_TransformMatrix", transformMatrix);
+		shader->setMat4("u_ViewProjectionMatrix", m_SceneData->viewProjectionMatrix);
 
 		vertexArray->bind();
 		RenderCommand::drawIndexed(vertexArray);
