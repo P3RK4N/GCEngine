@@ -174,9 +174,6 @@
     <ClInclude Include="src\Platform\OpenGL\OpenGLVertexArray.h">
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="src\Platform\Windows\WindowsInput.h">
-      <Filter>src\Platform\Windows</Filter>
-    </ClInclude>
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h">
       <Filter>src\Platform\Windows</Filter>
     </ClInclude>
@@ -1428,6 +1425,12 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
+    <ClInclude Include="src\GCE\Scene\Scene.h" />
+    <ClInclude Include="src\GCE\Scene\Components.h" />
+    <ClInclude Include="src\GCE\Scene\Entity.h" />
+    <ClInclude Include="src\GCE\Renderer\Camera.h" />
+    <ClInclude Include="src\GCE\Scene\SceneCamera.h" />
+    <ClInclude Include="src\GCE\Scene\ScriptableEntity.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GCE\Core\Application.cpp">
@@ -1517,5 +1520,8 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="src\GCE\Scene\Scene.cpp" />
+    <ClCompile Include="src\GCE\Scene\Entity.cpp" />
+    <ClCompile Include="src\GCE\Scene\SceneCamera.cpp" />
   </ItemGroup>
 </Project>

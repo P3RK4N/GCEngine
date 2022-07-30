@@ -1,5 +1,5 @@
 #include "GCEPCH.h"
-#include "Platform/Windows/WindowsInput.h" 
+#include "GCE/Core/Input.h" 
 
 #include "GCE/Core/Application.h"
 
@@ -7,23 +7,21 @@
 
 namespace GCE
 {
-	Input* Input::s_Instance = new WindowsInput();
-
-	bool WindowsInput::isKeyPressedImpl(int keycode)
+	bool Input::isKeyPressed(int keycode)
 	{
 		auto window = static_cast<GLFWwindow*>(Application::get()->getWindow().getNativeWindow());
 		auto state = glfwGetKey(window, keycode);
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
 
-	bool WindowsInput::isMouseButtonPressedImpl(int button)
+	bool Input::isMouseButtonPressed(int button)
 	{
 		auto window = static_cast<GLFWwindow*>(Application::get()->getWindow().getNativeWindow());
 		auto state = glfwGetMouseButton(window, button);
 		return state == GLFW_PRESS;
 	}
 
-	std::pair<float, float> WindowsInput::getMousePositionImpl()
+	std::pair<float, float> Input::getMousePosition()
 	{
 		auto window = static_cast<GLFWwindow*>(Application::get()->getWindow().getNativeWindow());
 		double xpos, ypos;
@@ -31,15 +29,15 @@ namespace GCE
 		return { (float)xpos, (float)ypos };
 	}
 
-	float WindowsInput::getMouseXImpl()
+	float Input::getMouseX()
 	{
-		auto [x, y] = WindowsInput::getMousePositionImpl();
+		auto [x, y] = Input::getMousePosition();
 		return x;
 	}
 
-	float WindowsInput::getMouseYImpl()
+	float Input::getMouseY()
 	{
-		auto [x, y] = WindowsInput::getMousePositionImpl();
+		auto [x, y] = Input::getMousePosition();
 		return y;
 	}
 }

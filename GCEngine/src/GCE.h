@@ -12,6 +12,11 @@
 #include "GCE/Core/KeyCodes.h"
 #include "GCE/Core/MouseButtonCodes.h"
 #include "GCE/Renderer/OrthographicCameraController.h"
+
+#include "GCE/Scene/Scene.h"
+#include "GCE/Scene/Entity.h"
+#include "GCE/Scene/ScriptableEntity.h"
+#include "GCE/Scene/Components.h"
 //--------------------------------------------------
 
 

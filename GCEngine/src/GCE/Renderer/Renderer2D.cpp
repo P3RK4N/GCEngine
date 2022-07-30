@@ -128,6 +128,20 @@ namespace GCE
 		s_Data.quadVertexBufferPtr = s_Data.quadVertexBufferBase;
 	}
 
+	void Renderer2D::beginScene(const Camera& camera, glm::mat4& transform)
+	{
+		GCE_PROFILE_FUNCTION();
+
+		glm::mat4 viewProj = camera.getProjection() * glm::inverse(transform);
+
+		s_Data.textureShader->bind();
+		s_Data.textureShader->setMat4("u_ViewProjectionMatrix", viewProj);
+
+		s_Data.quadIndexCount = 0;
+		s_Data.textureSlotIndex = 1;
+		s_Data.quadVertexBufferPtr = s_Data.quadVertexBufferBase;
+	}
+
 	void Renderer2D::endScene()
 	{
 		GCE_PROFILE_FUNCTION();
@@ -273,6 +287,77 @@ namespace GCE
 		}
 
 		glm::mat4 transform = glm::scale(glm::translate(glm::mat4(1.0f), position), glm::vec3(size, 1.0f));
+
+		for (int i = 0; i < quadVertexCount; i++)
+		{
+			s_Data.quadVertexBufferPtr->pos = transform * s_Data.quadVertexPositions[i];
+			s_Data.quadVertexBufferPtr->col = color;
+			s_Data.quadVertexBufferPtr->uv = texCoords[i];
+			s_Data.quadVertexBufferPtr->texIndex = textureIndex;
+			s_Data.quadVertexBufferPtr->textureScale = textureScale;
+			s_Data.quadVertexBufferPtr++;
+		}
+
+		s_Data.quadIndexCount += 6;
+		s_Data.stats.quadCount++;
+	}
+
+	void Renderer2D::drawQuad(const glm::mat4& transform, const glm::vec4& color)
+	{
+		GCE_PROFILE_FUNCTION();
+
+		if (s_Data.quadIndexCount >= Renderer2DData::maxIndices)
+			flushAndReset();
+
+		constexpr int quadVertexCount = 4;
+		constexpr float textureIndex = 0.0f;
+		constexpr float textureScale = 1.0f;
+		constexpr glm::vec2 texCoords[quadVertexCount] = { { 0.0f, 0.0f}, { 1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f} };
+
+		for (int i = 0; i < quadVertexCount; i++)
+		{
+			s_Data.quadVertexBufferPtr->pos = transform * s_Data.quadVertexPositions[i];
+			s_Data.quadVertexBufferPtr->col = color;
+			s_Data.quadVertexBufferPtr->uv = texCoords[i];
+			s_Data.quadVertexBufferPtr->texIndex = textureIndex;
+			s_Data.quadVertexBufferPtr->textureScale = textureScale;
+			s_Data.quadVertexBufferPtr++;
+		}
+
+		s_Data.quadIndexCount += 6;
+		s_Data.stats.quadCount++;
+	}
+
+	void Renderer2D::drawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, int textureScale, const glm::vec4& color)
+	{
+		GCE_PROFILE_FUNCTION();
+
+		if (s_Data.quadIndexCount >= Renderer2DData::maxIndices)
+			flushAndReset();
+
+		constexpr int quadVertexCount = 4;
+		constexpr glm::vec2 texCoords[quadVertexCount] = { { 0.0f, 0.0f}, { 1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f} };
+
+		float textureIndex = 0.0f;
+
+		for (unsigned int i = 0; i < s_Data.textureSlotIndex; i++)
+		{
+			if (*s_Data.textureSlots[i].get() == *texture.get())
+			{
+				textureIndex = (float)i;
+				break;
+			}
+		}
+
+		if (textureIndex == 0.0f)
+		{
+			if (s_Data.textureSlotIndex == 32)
+				flushAndReset();
+
+			textureIndex = (float)s_Data.textureSlotIndex;
+			s_Data.textureSlots[s_Data.textureSlotIndex] = texture;
+			s_Data.textureSlotIndex++;
+		}
 
 		for (int i = 0; i < quadVertexCount; i++)
 		{

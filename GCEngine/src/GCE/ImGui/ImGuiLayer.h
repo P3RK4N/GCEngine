@@ -16,11 +16,15 @@ namespace GCE
 
 		virtual void onAttach() override;
 		virtual void onDetach() override;
+		virtual void onEvent(Event& event) override;
 
 		void Begin();
 		void End();
 
+		void setBlockEvents(bool block) { m_BlockEvents = block; }
+
 	private:
+		bool m_BlockEvents = true;
 		float m_Time = 0.0f;
 	};
 }

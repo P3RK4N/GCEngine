@@ -26,6 +26,10 @@ namespace GCE
 		void pushOverlay(Layer* layer);
 
 		inline Window& getWindow() { return *m_Window; }
+
+		ImGuiLayer* getImGuiLayer() { return m_ImGuiLayer; }
+
+	public:
 		inline static Application* get() { return s_Instance; }
 
 	private:

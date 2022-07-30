@@ -8,6 +8,35 @@
 
 namespace GCE
 {
+	class CameraController : public ScriptableEntity
+	{
+	public:
+		void onCreate()
+		{
+
+		}
+
+		void onDestroy()
+		{
+
+		}
+
+		void onUpdate(Timestep ts)
+		{
+			auto& transform = getComponent<TransformComponent>().transform;
+			float speed = 5.0f;
+
+			if (Input::isKeyPressed(GCE_KEY_A))
+				transform[3][0] -= speed * ts;
+			if (Input::isKeyPressed(GCE_KEY_D))
+				transform[3][0] += speed * ts;
+			if (Input::isKeyPressed(GCE_KEY_S))
+				transform[3][1] -= speed * ts;
+			if (Input::isKeyPressed(GCE_KEY_W))
+				transform[3][1] += speed * ts;
+		}
+	};
+
 	EditorLayer::EditorLayer() :
 		Layer("EditorLayer"),
 		m_CameraController(16.0f / 9.0f),
@@ -27,6 +56,18 @@ namespace GCE
 		spec.width = 1280;
 		spec.height = 720;
 		m_FrameBuffer = FrameBuffer::create(spec);
+
+		m_Scene = createRef<Scene>();
+
+		m_Entity = m_Scene->createEntity("Square");
+		m_Entity.addComponent<SpriteRendererComponent>(glm::vec4(0.0f, 1.0f, 0.2f, 1.0f));
+
+		m_Camera = m_Scene->createEntity("Camera");
+		m_Camera.addComponent<CameraComponent>();
+
+		m_Camera.addComponent<NativeScriptComponent>().bind<CameraController>();
+
+		m_SceneHierarchyPanel.setContext(m_Scene);
 	}
 
 	void EditorLayer::onDetach()
@@ -39,32 +80,29 @@ namespace GCE
 	{
 		GCE_PROFILE_FUNCTION();
 
-		//Update
-		m_CameraController.onUpdate(ts);
+		//Update viewport
+		FrameBufferSpecification spec = m_FrameBuffer->getSpecification();
+		if (m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && (spec.width != m_ViewportSize.x || spec.height != m_ViewportSize.y))
+		{
+			m_FrameBuffer->resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_Scene->onViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+		}
+
+
+		//Update cam controller
+		if (m_ViewportFocused)
+			m_CameraController.onUpdate(ts);
 
 		//Render
-		{
-			GCE_PROFILE_SCOPE("Renderer Prep");
-			Renderer2D::resetStats();
-			m_FrameBuffer->bind();
-			RenderCommand::setClearColor({ 0.1f, 0.1f, 0.1f, 1 });
-			RenderCommand::clear();
-		}
+		m_FrameBuffer->bind();
 
-		{
-			GCE_PROFILE_SCOPE("Renderer draw");
+		Renderer2D::resetStats();
+		RenderCommand::setClearColor({ 0.1f, 0.1f, 0.1f, 1 });
+		RenderCommand::clear();
 
-			Renderer2D::beginScene(m_CameraController.getCamera());
+		m_Scene->onUpdate(ts);
 
-			Renderer2D::drawQuad(m_Position, m_Scale, m_Color);
-			Renderer2D::drawQuad(m_Position + glm::vec2(0.2f, -0.5f), m_Scale, m_Color);
-			Renderer2D::drawQuadRotated(m_Position + glm::vec2(-1.0f, -1.0f), m_Scale, m_Rotation, m_Color);
-			Renderer2D::drawQuadRotated(m_Position + glm::vec2(0.7f, 0.7f), m_Scale, m_Rotation, texture, m_TextureScale, m_Color);
-			Renderer2D::drawQuadRotated(m_Position + glm::vec2(1.3f, -1.3f), m_Scale, m_Rotation, stairs, m_Color);
-
-			Renderer2D::endScene();
-			m_FrameBuffer->unbind();
-		}
+		m_FrameBuffer->unbind();
 	}
 
 	void EditorLayer::onImGuiRender()
@@ -123,6 +161,8 @@ namespace GCE
 			ImGui::EndMenuBar();
 		}
 
+		m_SceneHierarchyPanel.onImGuiRender();
+
 		draw();
 
 		ImGui::End();
@@ -138,13 +178,6 @@ namespace GCE
 	{
 		ImGui::Begin("Settings");
 
-		ImGui::ColorEdit4("Color", glm::value_ptr(m_Color));
-		ImGui::DragFloat2("Position", glm::value_ptr(m_Position), m_DragSpeed);
-		ImGui::DragFloat2("Scale", glm::value_ptr(m_Scale), m_DragSpeed);
-		ImGui::SliderAngle("Rotation", &m_Rotation, -180.0f, 180.0f);
-		ImGui::SliderInt("Texture scale", &m_TextureScale, 1, 10);
-		ImGui::Spacing();
-
 		auto stats = Renderer2D::getStats();
 		ImGui::Text("Renderer2D stats:");
 		ImGui::Text("Draw calls: %d", stats.drawCalls);
@@ -158,18 +191,15 @@ namespace GCE
 		ImGui::Begin("Viewport");
 		ImGui::PopStyleVar();
 
-		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-		if (m_ViewPortSize != *((glm::vec2*)&viewportPanelSize))
-		{
-			//GCE_TRACE("{0}, {1}", viewportPanelSize.x, viewportPanelSize.y);
-			m_ViewPortSize = { viewportPanelSize.x, viewportPanelSize.y };
+		m_ViewportFocused = ImGui::IsWindowFocused();
+		m_ViewportHovered = ImGui::IsWindowHovered();
+		Application::get()->getImGuiLayer()->setBlockEvents(!m_ViewportFocused || !m_ViewportHovered);
 
-			m_FrameBuffer->resize((unsigned int)m_ViewPortSize.x, (unsigned int)m_ViewPortSize.y);
-			m_CameraController.onResize(m_ViewPortSize.x, m_ViewPortSize.y);
-		}
+		auto newViewportSize = ImGui::GetContentRegionAvail();
+		m_ViewportSize = *(glm::vec2*)&(newViewportSize);
 
 		unsigned int textureID = m_FrameBuffer->getColorAttachmentRendererID();
-		ImGui::Image((void*)textureID, ImVec2(m_ViewPortSize.x, m_ViewPortSize.y), ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::Image((void*)textureID, ImVec2(m_ViewportSize.x, m_ViewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
 
 		ImGui::End();
 	}

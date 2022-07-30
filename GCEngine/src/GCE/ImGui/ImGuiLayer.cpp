@@ -58,6 +58,16 @@ namespace GCE
 		ImGui::DestroyContext();
 	}
 
+	void ImGuiLayer::onEvent(Event& event)
+	{
+		if (m_BlockEvents)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+			event.m_Handled |= event.isInCategory(EventCategoryMouse) & io.WantCaptureMouse;
+			event.m_Handled |= event.isInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+		}
+	}
+
 	void ImGuiLayer::Begin()
 	{
 		GCE_PROFILE_FUNCTION();

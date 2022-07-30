@@ -13,6 +13,7 @@ IncludeDir["Glad"] = "GCEngine/vendor/Glad/include"
 IncludeDir["ImGui"] = "GCEngine/vendor/imgui"
 IncludeDir["glm"] = "GCEngine/vendor/glm"
 IncludeDir["stb_image"] = "GCEngine/vendor/stb_image"
+IncludeDir["entt"] = "GCEngine/vendor/entt/include"
 
 group "Dependencies"
     include "GCEngine/vendor/GLFW"
@@ -51,7 +52,8 @@ project "GCEngine"
         "%{IncludeDir.Glad}",
         "%{IncludeDir.ImGui}",
         "%{IncludeDir.glm}",
-        "%{IncludeDir.stb_image}"
+        "%{IncludeDir.stb_image}",
+        "%{IncludeDir.entt}"
     }
 
     links
@@ -109,7 +111,8 @@ project "Sandbox"
         "GCEngine/vendor/spdlog/include",
         "GCEngine/src",
         "%{IncludeDir.glm}",
-        "%{IncludeDir.ImGui}"
+        "%{IncludeDir.ImGui}",
+        "%{IncludeDir.entt}"
     }
 
     links
@@ -163,7 +166,8 @@ project "GCEditor"
         "GCEngine/vendor/spdlog/include",
         "GCEngine/src",
         "%{IncludeDir.glm}",
-        "%{IncludeDir.ImGui}"
+        "%{IncludeDir.ImGui}",
+        "%{IncludeDir.entt}"
     }
 
     links

@@ -1,6 +1,8 @@
 #pragma once
 #include "GCE.h"
 
+#include "Panels/SceneHierarchyPanel.h"
+
 namespace GCE
 {
 	class EditorLayer : public Layer
@@ -24,7 +26,10 @@ namespace GCE
 
 		//TEMP
 		Ref<FrameBuffer> m_FrameBuffer;
-		glm::vec2 m_ViewPortSize = {0, 0};
+		glm::vec2 m_ViewportSize = {0, 0};
+		bool m_ViewportFocused = false;
+		bool m_ViewportHovered = false;
+		Ref<Scene> m_Scene;
 
 		Ref<Texture2D> texture;
 		Ref<Texture2D> spriteSheet;
@@ -37,5 +42,12 @@ namespace GCE
 		int m_TextureScale = 1;
 
 		float m_DragSpeed = 0.1f;
+
+		Entity m_Entity;
+		Entity m_Camera;
+
+		//Panels
+		SceneHierarchyPanel m_SceneHierarchyPanel;
+
 	};
 }
