@@ -23,6 +23,8 @@ namespace GCE
 
 		void setBlockEvents(bool block) { m_BlockEvents = block; }
 
+		void setDarkThemeColors();
+
 	private:
 		bool m_BlockEvents = true;
 		float m_Time = 0.0f;

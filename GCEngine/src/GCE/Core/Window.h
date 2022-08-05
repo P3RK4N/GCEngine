@@ -11,8 +11,8 @@ namespace GCE
 		unsigned int height;
 
 		WindowProps(const std::string& title = "GCEngine", 
-					unsigned int width = 1280,
-					unsigned int height = 720)
+					unsigned int width = 1600,
+					unsigned int height = 900)
 			: title(title), width(width), height(height) {}
 
 	};

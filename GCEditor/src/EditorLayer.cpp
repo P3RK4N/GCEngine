@@ -23,25 +23,22 @@ namespace GCE
 
 		void onUpdate(Timestep ts)
 		{
-			auto& transform = getComponent<TransformComponent>().transform;
+			auto& transform = getComponent<TransformComponent>();
 			float speed = 5.0f;
 
 			if (Input::isKeyPressed(GCE_KEY_A))
-				transform[3][0] -= speed * ts;
+				transform.translation[0] -= speed * ts;
 			if (Input::isKeyPressed(GCE_KEY_D))
-				transform[3][0] += speed * ts;
+				transform.translation[0] += speed * ts;
 			if (Input::isKeyPressed(GCE_KEY_S))
-				transform[3][1] -= speed * ts;
+				transform.translation[1] -= speed * ts;
 			if (Input::isKeyPressed(GCE_KEY_W))
-				transform[3][1] += speed * ts;
+				transform.translation[1] += speed * ts;
 		}
 	};
 
 	EditorLayer::EditorLayer() :
-		Layer("EditorLayer"),
-		m_CameraController(16.0f / 9.0f),
-		texture(Texture2D::create("assets/textures/flowerPattern.jpg")),
-		spriteSheet(Texture2D::create("assets/textures/spriteSheet.png"))
+		Layer("EditorLayer")
 	{
 
 	}
@@ -49,8 +46,6 @@ namespace GCE
 	void EditorLayer::onAttach()
 	{
 		GCE_PROFILE_FUNCTION();
-
-		stairs = SubTexture2D::createFromCoords(spriteSheet, { 7, 6 }, { 64, 64 });
 
 		FrameBufferSpecification spec;
 		spec.width = 1280;
@@ -87,11 +82,6 @@ namespace GCE
 			m_FrameBuffer->resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 			m_Scene->onViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 		}
-
-
-		//Update cam controller
-		if (m_ViewportFocused)
-			m_CameraController.onUpdate(ts);
 
 		//Render
 		m_FrameBuffer->bind();
@@ -147,12 +137,18 @@ namespace GCE
 
 		// Submit the DockSpace
 		ImGuiIO& io = ImGui::GetIO();
+		
+		ImGuiStyle& style = ImGui::GetStyle();
+		float prevSize = style.WindowMinSize.x;
+		style.WindowMinSize.x = 370.0f;
+
 		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 		{
 			ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
 			ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 		}
 
+		style.WindowMinSize.x = prevSize;
 
 		if (ImGui::BeginMenuBar())
 		{
@@ -170,7 +166,7 @@ namespace GCE
 
 	void EditorLayer::onEvent(Event& e)
 	{
-		m_CameraController.onEvent(e);
+
 	}
 
 

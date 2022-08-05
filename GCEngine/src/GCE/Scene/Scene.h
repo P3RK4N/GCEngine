@@ -7,6 +7,7 @@
 namespace GCE
 {
 	class Entity;
+	struct CameraComponent;
 
 	class Scene
 	{
@@ -15,12 +16,16 @@ namespace GCE
 		~Scene();
 
 		Entity createEntity(const std::string& name = "");
+		void destroyEntity(Entity entity);
 
 		void onUpdate(Timestep ts);
 		void onViewportResize(unsigned int width, unsigned int height);
 
 	private:
-		void resetAspectRatio();
+		void resetCameraComponent(CameraComponent& cameraComponent);
+
+		template<typename T>
+		void onComponentAdded(Entity entity, T& component);
 
 	private:
 		entt::registry m_Registry;
