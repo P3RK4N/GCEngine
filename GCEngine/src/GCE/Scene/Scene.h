@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GCE/Core/Timestep.h"
+#include "GCE/Renderer/EditorCamera.h"
 
 #include <entt.hpp>
 
@@ -18,8 +19,11 @@ namespace GCE
 		Entity createEntity(const std::string& name = "");
 		void destroyEntity(Entity entity);
 
-		void onUpdate(Timestep ts);
+		void onUpdateEditor(Timestep ts, EditorCamera& camera);
+		void onUpdateRuntime(Timestep ts);
 		void onViewportResize(unsigned int width, unsigned int height);
+
+		Entity getPrimaryCamera();
 
 	private:
 		void resetCameraComponent(CameraComponent& cameraComponent);
@@ -35,5 +39,6 @@ namespace GCE
 
 		friend class Entity;
 		friend class SceneHierarchyPanel;
+		friend class SceneSerializer;
 	};
 }

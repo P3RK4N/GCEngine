@@ -114,6 +114,7 @@ namespace GCE
 	{
 		GCE_PROFILE_FUNCTION();
 
+		delete[] s_Data.quadVertexBufferBase;
 	}
 
 	void Renderer2D::beginScene(const OrthographicCamera& orthographicCamera)
@@ -137,6 +138,23 @@ namespace GCE
 		s_Data.textureShader->bind();
 		s_Data.textureShader->setMat4("u_ViewProjectionMatrix", viewProj);
 
+		startBatch();
+	}
+
+	void Renderer2D::beginScene(const EditorCamera& camera)
+	{
+		GCE_PROFILE_FUNCTION();
+
+		glm::mat4 viewProj = camera.getViewProjection();
+
+		s_Data.textureShader->bind();
+		s_Data.textureShader->setMat4("u_ViewProjectionMatrix", viewProj);
+
+		startBatch();
+	}
+
+	void Renderer2D::startBatch()
+	{
 		s_Data.quadIndexCount = 0;
 		s_Data.textureSlotIndex = 1;
 		s_Data.quadVertexBufferPtr = s_Data.quadVertexBufferBase;
@@ -146,7 +164,7 @@ namespace GCE
 	{
 		GCE_PROFILE_FUNCTION();
 
-		unsigned int dataSize = (uint8_t*)s_Data.quadVertexBufferPtr - (uint8_t*)s_Data.quadVertexBufferBase;
+		unsigned int dataSize = (unsigned int)((uint8_t*)s_Data.quadVertexBufferPtr - (uint8_t*)s_Data.quadVertexBufferBase);
 		s_Data.quadVertexBuffer->setData(s_Data.quadVertexBufferBase, dataSize);
 
 		flush();
@@ -154,13 +172,16 @@ namespace GCE
 
 	void Renderer2D::flush()
 	{
+		if(!s_Data.quadIndexCount)
+			return;
+
 		for (unsigned int i = 0; i < s_Data.textureSlotIndex; i++)
 		{
 			s_Data.textureSlots[i]->bind(i);
 		}
 
-		s_Data.stats.drawCalls++;
 		RenderCommand::drawIndexed(s_Data.quadVertexArray, s_Data.quadIndexCount);
+		s_Data.stats.drawCalls++;
 	}
 
 	void Renderer2D::drawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
@@ -525,9 +546,7 @@ namespace GCE
 	{
 		endScene();
 
-		s_Data.quadIndexCount = 0;
-		s_Data.quadVertexBufferPtr = s_Data.quadVertexBufferBase;
-		s_Data.textureSlotIndex = 1;
+		startBatch();
 	}
 
 }

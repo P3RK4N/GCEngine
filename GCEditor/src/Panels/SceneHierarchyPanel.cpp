@@ -17,6 +17,7 @@ namespace GCE
 	void SceneHierarchyPanel::setContext(const Ref<Scene>& scene)
 	{
 		m_Context = scene;
+		m_SelectionContext = {};
 	}
 
 	void SceneHierarchyPanel::onImGuiRender()

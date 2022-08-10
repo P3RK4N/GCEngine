@@ -14,11 +14,14 @@ IncludeDir["ImGui"] = "GCEngine/vendor/imgui"
 IncludeDir["glm"] = "GCEngine/vendor/glm"
 IncludeDir["stb_image"] = "GCEngine/vendor/stb_image"
 IncludeDir["entt"] = "GCEngine/vendor/entt/include"
+IncludeDir["yaml_cpp"] = "GCEngine/vendor/yaml-cpp/include"
+IncludeDir["ImGuizmo"] = "GCEngine/vendor/ImGuizmo"
 
 group "Dependencies"
     include "GCEngine/vendor/GLFW"
     include "GCEngine/vendor/Glad"
     include "GCEngine/vendor/imgui"
+    include "GCEngine/vendor/yaml-cpp"
 group ""
 
 project "GCEngine"
@@ -41,7 +44,9 @@ project "GCEngine"
         "%{prj.name}/vendor/stb_image/**.cpp",
         "%{prj.name}/vendor/stb_image/**.h",
         "%{prj.name}/vendor/glm/glm/**.hpp",
-        "%{prj.name}/vendor/glm/glm/**.inl"
+        "%{prj.name}/vendor/glm/glm/**.inl",
+        "%{prj.name}/vendor/ImGuizmo/ImGuizmo.h",
+        "%{prj.name}/vendor/ImGuizmo/ImGuizmo.cpp"
     }
 
     includedirs
@@ -53,7 +58,9 @@ project "GCEngine"
         "%{IncludeDir.ImGui}",
         "%{IncludeDir.glm}",
         "%{IncludeDir.stb_image}",
-        "%{IncludeDir.entt}"
+        "%{IncludeDir.entt}",
+        "%{IncludeDir.yaml_cpp}",
+        "%{IncludeDir.ImGuizmo}"
     }
 
     links
@@ -61,8 +68,12 @@ project "GCEngine"
         "GLFW",
         "Glad",
         "ImGui",
+        "yaml-cpp",
         "opengl32.lib"
     }
+
+    filter "files:vendor/ImGuizmo/**.cpp"
+        flags { "NoPCH" }
 
     defines
     {
@@ -167,7 +178,8 @@ project "GCEditor"
         "GCEngine/src",
         "%{IncludeDir.glm}",
         "%{IncludeDir.ImGui}",
-        "%{IncludeDir.entt}"
+        "%{IncludeDir.entt}",
+        "%{IncludeDir.ImGuizmo}"
     }
 
     links

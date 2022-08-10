@@ -1,10 +1,15 @@
 #include "EditorLayer.h"
 
 #include <GCE/Core/EntryPoint.h>
+#include <GCE/Scene/SceneSerializer.h>
+#include <GCE/Utils/PlatformUtils.h>
 
 #include <imgui.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <ImGuizmo.h>
+
+#include <GCE/Math/Math.h>
 
 namespace GCE
 {
@@ -54,13 +59,15 @@ namespace GCE
 
 		m_Scene = createRef<Scene>();
 
-		m_Entity = m_Scene->createEntity("Square");
+		m_EditorCamera = EditorCamera(45.0f, 1.778f, 0.01f, 1000.0f);
+
+		/*m_Entity = m_Scene->createEntity("Square");
 		m_Entity.addComponent<SpriteRendererComponent>(glm::vec4(0.0f, 1.0f, 0.2f, 1.0f));
 
 		m_Camera = m_Scene->createEntity("Camera");
 		m_Camera.addComponent<CameraComponent>();
 
-		m_Camera.addComponent<NativeScriptComponent>().bind<CameraController>();
+		m_Camera.addComponent<NativeScriptComponent>().bind<CameraController>();*/
 
 		m_SceneHierarchyPanel.setContext(m_Scene);
 	}
@@ -81,6 +88,12 @@ namespace GCE
 		{
 			m_FrameBuffer->resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 			m_Scene->onViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_EditorCamera.setViewportSize(m_ViewportSize.x, m_ViewportSize.y);
+		}
+
+		if (m_ViewportFocused || m_ViewportHovered)
+		{
+			m_EditorCamera.onUpdate(ts);
 		}
 
 		//Render
@@ -90,7 +103,7 @@ namespace GCE
 		RenderCommand::setClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		RenderCommand::clear();
 
-		m_Scene->onUpdate(ts);
+		m_Scene->onUpdateEditor(ts, m_EditorCamera);
 
 		m_FrameBuffer->unbind();
 	}
@@ -152,7 +165,25 @@ namespace GCE
 
 		if (ImGui::BeginMenuBar())
 		{
-			ImGui::Text("Menu Bar not added yet!");
+			if (ImGui::BeginMenu("Options"))
+			{
+				if (ImGui::MenuItem("New", "Ctrl+N"))
+				{
+					newScene();
+				}
+
+				if (ImGui::MenuItem("Open...", "Ctrl+O"))
+				{
+					openScene();
+				}
+
+				if (ImGui::MenuItem("Save as...", "Ctrl+Shift+S"))
+				{
+					saveScene();
+				}
+
+				ImGui::EndMenu();
+			}
 
 			ImGui::EndMenuBar();
 		}
@@ -166,13 +197,87 @@ namespace GCE
 
 	void EditorLayer::onEvent(Event& e)
 	{
+		m_EditorCamera.onEvent(e);
 
+		EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<KeyPressedEvent>(GCE_BIND_EVENT_FN(EditorLayer::onKeyPressed));
 	}
 
+	bool EditorLayer::onKeyPressed(KeyPressedEvent& e)
+	{
+		if(e.getRepeatCount() > 0)
+			return false;
+
+		bool control = Input::isKeyPressed(GCE_KEY_LEFT_CONTROL) || Input::isKeyPressed(GCE_KEY_RIGHT_CONTROL);
+		bool shift = Input::isKeyPressed(GCE_KEY_LEFT_SHIFT) || Input::isKeyPressed(GCE_KEY_LEFT_SHIFT);
+
+		switch (e.getKeyCode())
+		{
+			case GCE_KEY_N:
+				if(control)
+					newScene();
+				break;
+
+			case GCE_KEY_O:
+				if(control)
+					openScene();
+				break;
+
+			case GCE_KEY_S:
+				if(control && shift)
+					saveScene();
+				break;
+
+			//Gizmos
+		case GCE_KEY_Q:
+			m_GizmoType = -1;
+			break;
+		case GCE_KEY_W:
+			m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
+			break;
+		case GCE_KEY_E:
+			m_GizmoType = ImGuizmo::OPERATION::ROTATE;
+			break;
+		case GCE_KEY_R:
+			m_GizmoType = ImGuizmo::OPERATION::SCALE;
+			break;
+		}
+	}
+
+	void EditorLayer::newScene()
+	{
+		m_Scene = createRef<Scene>();
+		m_Scene->onViewportResize((unsigned int)m_ViewportSize.x, (unsigned int)m_ViewportSize.y);
+		m_SceneHierarchyPanel.setContext(m_Scene);
+	}
+
+	void EditorLayer::openScene()
+	{
+		std::string filePath = FileDialogs::openFile("GCE Scene (*.gce)\0*.gce\0");
+		if(!filePath.empty())
+		{
+			m_Scene = createRef<Scene>();
+			m_Scene->onViewportResize((unsigned int)m_ViewportSize.x, (unsigned int)m_ViewportSize.y);
+			m_SceneHierarchyPanel.setContext(m_Scene);
+
+			SceneSerializer serializer(m_Scene);
+			serializer.deserialize(filePath);
+		}
+	}
+
+	void EditorLayer::saveScene()
+	{
+		std::string filePath = FileDialogs::saveFile("GCE Scene (*.gce)\0*.gce\0");
+		if (!filePath.empty())
+		{
+			SceneSerializer serializer(m_Scene);
+			serializer.serialize(filePath);
+		}
+	}
 
 	void EditorLayer::draw()
 	{
-		ImGui::Begin("Settings");
+		ImGui::Begin("Statistics");
 
 		auto stats = Renderer2D::getStats();
 		ImGui::Text("Renderer2D stats:");
@@ -189,13 +294,69 @@ namespace GCE
 
 		m_ViewportFocused = ImGui::IsWindowFocused();
 		m_ViewportHovered = ImGui::IsWindowHovered();
-		Application::get()->getImGuiLayer()->setBlockEvents(!m_ViewportFocused || !m_ViewportHovered);
+		Application::get()->getImGuiLayer()->setBlockEvents(!m_ViewportFocused && !m_ViewportHovered);
 
 		auto newViewportSize = ImGui::GetContentRegionAvail();
 		m_ViewportSize = *(glm::vec2*)&(newViewportSize);
 
 		unsigned int textureID = m_FrameBuffer->getColorAttachmentRendererID();
 		ImGui::Image((void*)textureID, ImVec2(m_ViewportSize.x, m_ViewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
+
+		//Gizmos
+		Entity selectedEntity = m_SceneHierarchyPanel.getSelectedEntity();
+
+		if(selectedEntity and m_GizmoType != -1)
+		{
+			ImGuizmo::SetOrthographic(false);
+			ImGuizmo::SetDrawlist();
+
+			float windowWidth = (float)ImGui::GetWindowWidth();
+			float windowHeight = (float)ImGui::GetWindowHeight();
+			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+
+			//Camera
+#if SceneCamera
+			//SceneCamera
+			auto cameraEntity = m_Scene->getPrimaryCamera();
+			const auto& camera = cameraEntity.getComponent<CameraComponent>().camera;
+
+			//Matrices
+			const glm::mat4& cameraProjection = camera.getProjection();
+			glm::mat4 cameraView = glm::inverse(cameraEntity.getComponent<TransformComponent>().getTransform());
+#else
+			//EditorCamera
+			//Matrices
+			const glm::mat4& cameraProjection = m_EditorCamera.getProjection();
+			glm::mat4 cameraView = m_EditorCamera.getViewMatrix();
+#endif
+
+			//Entity
+			auto& entityTransformComponent = selectedEntity.getComponent<TransformComponent>();
+			glm::mat4 transform = entityTransformComponent.getTransform();
+
+			//Snapping
+			bool snap = Input::isKeyPressed(GCE_KEY_LEFT_CONTROL);
+			float snapValue = 0.5f;
+			if (m_GizmoType == ImGuizmo::OPERATION::ROTATE)
+				snapValue = 45.0f;
+
+			float snapValues[3] = { snapValue, snapValue, snapValue };
+
+
+			ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection), (ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform), nullptr, snap ? snapValues : nullptr);
+
+			if (ImGuizmo::IsUsing())
+			{
+				glm::vec3 translation, rotation, scale;
+				Math::DecomposeTransform(transform, translation, rotation, scale);
+
+				glm::vec3 deltaRotation = rotation - entityTransformComponent.rotation;
+
+				entityTransformComponent.translation = translation;
+				entityTransformComponent.rotation += deltaRotation;
+				entityTransformComponent.scale = scale;
+			}
+		}
 
 		ImGui::End();
 	}

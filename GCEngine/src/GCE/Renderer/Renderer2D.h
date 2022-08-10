@@ -2,6 +2,7 @@
 
 #include "GCE/Renderer/Camera.h"
 #include "GCE/Renderer/OrthographicCamera.h"
+#include "GCE/Renderer/EditorCamera.h"
 
 #include "GCE/Renderer/Texture.h"
 #include "GCE/Renderer/SubTexture2D.h"
@@ -17,8 +18,12 @@ namespace GCE
 		static void shutdown();
 
 		static void beginScene(const Camera& camera, glm::mat4& transform);
+		static void beginScene(const EditorCamera& camera);
 		static void beginScene(const OrthographicCamera& orthographicCamera);
+
 		static void endScene();
+
+		static void startBatch();
 		static void flush();
 
 		//Primitives

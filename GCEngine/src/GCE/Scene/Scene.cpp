@@ -35,7 +35,21 @@ namespace GCE
 		m_Registry.destroy(entity);
 	}
 
-	void Scene::onUpdate(Timestep ts)
+	void Scene::onUpdateEditor(Timestep ts, EditorCamera& camera)
+	{
+		Renderer2D::beginScene(camera);
+
+		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+		for (auto entity : group)
+		{
+			auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+			Renderer2D::drawQuad(transform.getTransform(), sprite.color);
+		}
+
+		Renderer2D::endScene();
+	}
+
+	void Scene::onUpdateRuntime(Timestep ts)
 	{
 		//SCRIPTS
 		m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
@@ -61,7 +75,7 @@ namespace GCE
 				Camera* mainCamera = &camera.camera;
 				glm::mat4 cameraTransform = transform.getTransform();
 
-				Renderer2D::beginScene(mainCamera->getProjection(), cameraTransform);
+				Renderer2D::beginScene(*mainCamera, cameraTransform);
 
 				auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
 				for (auto entity : group)
@@ -96,6 +110,19 @@ namespace GCE
 		if (!cameraComponent.fixedAspectRatio)
 				cameraComponent.camera.setViewportSize(m_ViewportWidth, m_ViewportHeight);
 	}
+
+	Entity Scene::getPrimaryCamera()
+	{
+		auto view = m_Registry.view<CameraComponent>();
+		for(auto entity : view)
+		{
+			const auto& cameraComponent = view.get<CameraComponent>(entity);
+			if (cameraComponent.primary)
+				return Entity{entity, this};
+		}
+		return {};
+	}
+
 
 	template<typename T>
 	void Scene::onComponentAdded(Entity, T& component)

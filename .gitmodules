@@ -13,3 +13,9 @@
 [submodule "GCEngine/vendor/glm"]
 	path = GCEngine/vendor/glm
 	url = https://github.com/g-truc/glm
+[submodule "GCEngine/vendor/yaml-cpp"]
+	path = GCEngine/vendor/yaml-cpp
+	url = https://github.com/TheCherno/yaml-cpp
+[submodule "GCEngine/vendor/ImGuizmo"]
+	path = GCEngine/vendor/ImGuizmo
+	url = https://github.com/thecherno/imguizmo

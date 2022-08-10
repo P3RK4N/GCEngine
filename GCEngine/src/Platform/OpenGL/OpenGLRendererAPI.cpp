@@ -33,7 +33,7 @@ namespace GCE
 
 	void OpenGLRendererAPI::drawIndexed(const GCE::Ref<VertexArray>& vertexArray, unsigned int indexCount)
 	{
-		unsigned int count = indexCount ? vertexArray->getIndexBuffer()->getCount() : indexCount;
+		unsigned int count = indexCount ? indexCount : vertexArray->getIndexBuffer()->getCount();
 		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 	}
 }

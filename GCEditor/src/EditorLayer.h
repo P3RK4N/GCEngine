@@ -22,6 +22,13 @@ namespace GCE
 		void draw();
 
 	private:
+		bool onKeyPressed(KeyPressedEvent& e);
+
+		void newScene();
+		void openScene();
+		void saveScene();
+
+	private:
 
 		//TEMP
 		Ref<FrameBuffer> m_FrameBuffer;
@@ -29,9 +36,9 @@ namespace GCE
 		bool m_ViewportFocused = false;
 		bool m_ViewportHovered = false;
 		Ref<Scene> m_Scene;
+		int m_GizmoType = -1;
 
-		Entity m_Entity;
-		Entity m_Camera;
+		EditorCamera m_EditorCamera;
 
 		//Panels
 		SceneHierarchyPanel m_SceneHierarchyPanel;

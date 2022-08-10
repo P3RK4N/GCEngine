@@ -17,6 +17,8 @@ namespace GCE
 
 		void onImGuiRender();
 
+		Entity getSelectedEntity() { return m_SelectionContext; }
+
 	private:
 		void drawEntityNode(Entity entity);
 		void drawComponents(Entity entity);
