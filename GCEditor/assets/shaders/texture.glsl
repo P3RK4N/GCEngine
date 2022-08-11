@@ -36,8 +36,10 @@ in vec2 v_UV;
 in float v_TexIndex;
 
 layout(location = 0) out vec4 color;
+layout(location = 1) out int color2;
 			
 void main()
 {
 color = texture(u_Textures[int(v_TexIndex)], v_UV) * v_Color;
+color2 = 50;
 }

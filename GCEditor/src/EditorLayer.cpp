@@ -55,6 +55,7 @@ namespace GCE
 		FrameBufferSpecification spec;
 		spec.width = 1280;
 		spec.height = 720;
+		spec.attachmentSpecification = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth };
 		m_FrameBuffer = FrameBuffer::create(spec);
 
 		m_Scene = createRef<Scene>();
@@ -104,6 +105,22 @@ namespace GCE
 		RenderCommand::clear();
 
 		m_Scene->onUpdateEditor(ts, m_EditorCamera);
+
+		auto[mx, my] = ImGui::GetMousePos();
+		mx -= m_ViewportBounds[0].x;
+		mx -= m_ViewportBounds[0].y;
+		glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
+
+		//Flip
+		my = viewportSize.y - my;
+
+		int mouseX = (int)mx;
+		int mouseY = (int)my;
+
+		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
+		{
+			int pixelData = m_FrameBuffer->readPixel(1, mouseX, mouseY);
+		}
 
 		m_FrameBuffer->unbind();
 	}
@@ -190,7 +207,8 @@ namespace GCE
 
 		m_SceneHierarchyPanel.onImGuiRender();
 
-		draw();
+		drawStats();
+		drawViewport();
 
 		ImGui::End();
 	}
@@ -275,7 +293,7 @@ namespace GCE
 		}
 	}
 
-	void EditorLayer::draw()
+	void EditorLayer::drawStats()
 	{
 		ImGui::Begin("Statistics");
 
@@ -287,10 +305,15 @@ namespace GCE
 		ImGui::Text("Indices: %d", stats.getTotalIndexCount());
 
 		ImGui::End();
+	}
 
+	void EditorLayer::drawViewport()
+	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0, 0});
 		ImGui::Begin("Viewport");
 		ImGui::PopStyleVar();
+
+		auto viewportOffset = ImGui::GetCursorPos();
 
 		m_ViewportFocused = ImGui::IsWindowFocused();
 		m_ViewportHovered = ImGui::IsWindowHovered();
@@ -302,7 +325,24 @@ namespace GCE
 		unsigned int textureID = m_FrameBuffer->getColorAttachmentRendererID();
 		ImGui::Image((void*)textureID, ImVec2(m_ViewportSize.x, m_ViewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
 
-		//Gizmos
+		//Mouse picking
+		auto windowSize = ImGui::GetWindowSize();
+		ImVec2 minBound = ImGui::GetWindowPos();
+		minBound.x += viewportOffset.x;
+		minBound.y += viewportOffset.y;
+		ImVec2 maxBound = { minBound.x + windowSize.x, minBound.y + windowSize.y };
+
+		m_ViewportBounds[0] = { minBound.x, minBound.y };
+		m_ViewportBounds[1] = { maxBound.x, maxBound.y };
+
+
+		drawGuizmo();
+
+		ImGui::End();
+	}
+
+	void EditorLayer::drawGuizmo()
+	{
 		Entity selectedEntity = m_SceneHierarchyPanel.getSelectedEntity();
 
 		if(selectedEntity and m_GizmoType != -1)
@@ -357,7 +397,6 @@ namespace GCE
 				entityTransformComponent.scale = scale;
 			}
 		}
-
-		ImGui::End();
 	}
+
 }

@@ -19,7 +19,9 @@ namespace GCE
 		virtual void onDetach() override;
 
 	public:
-		void draw();
+		void drawStats();
+		void drawViewport();
+		void drawGuizmo();
 
 	private:
 		bool onKeyPressed(KeyPressedEvent& e);
@@ -33,6 +35,7 @@ namespace GCE
 		//TEMP
 		Ref<FrameBuffer> m_FrameBuffer;
 		glm::vec2 m_ViewportSize = {0, 0};
+		glm::vec2 m_ViewportBounds[2];
 		bool m_ViewportFocused = false;
 		bool m_ViewportHovered = false;
 		Ref<Scene> m_Scene;
