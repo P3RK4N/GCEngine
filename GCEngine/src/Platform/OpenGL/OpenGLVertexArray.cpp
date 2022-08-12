@@ -68,15 +68,48 @@ namespace GCE
 		for (const BufferElement& element : vertexBuffer->getLayout())
 		{
 			glEnableVertexAttribArray(i);
-			glVertexAttribPointer
-			(
-				i++,
-				element.getComponentCount(),
-				ShaderDataTypeToOpenGLBaseType(element.type),
-				element.normalized ? GL_TRUE : GL_FALSE,
-				vertexBuffer->getLayout().getStride(),
-				(const void*)element.offset
-			);
+
+			switch (element.type)
+			{
+				case ShaderDataType::Float:		
+				case ShaderDataType::Float2:	
+				case ShaderDataType::Float3:	
+				case ShaderDataType::Float4:
+				{
+					glVertexAttribPointer
+					(
+						i++,
+						element.getComponentCount(),
+						ShaderDataTypeToOpenGLBaseType(element.type),
+						element.normalized ? GL_TRUE : GL_FALSE,
+						vertexBuffer->getLayout().getStride(),
+						(const void*)element.offset
+					);
+					break;
+				}
+
+				case ShaderDataType::Int:		
+				case ShaderDataType::Int2:		
+				case ShaderDataType::Int3:		
+				case ShaderDataType::Int4:		
+				case ShaderDataType::Bool:
+				{
+					glVertexAttribIPointer
+					(
+						i++,
+						element.getComponentCount(),
+						ShaderDataTypeToOpenGLBaseType(element.type),
+						vertexBuffer->getLayout().getStride(),
+						(const void*)element.offset
+					);
+					break;
+				}
+
+				case ShaderDataType::Mat3:		
+				case ShaderDataType::Mat4:
+					break;
+			}
+			
 		}
 		
 		m_VertexBuffers.push_back(vertexBuffer);

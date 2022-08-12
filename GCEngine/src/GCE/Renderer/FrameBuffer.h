@@ -52,7 +52,9 @@ namespace GCE
 
 		virtual void resize(unsigned int width, unsigned int height) = 0;
 		virtual int readPixel(unsigned int attachmentIndex, int x, int y) = 0;
-		
+
+		virtual void clearColorAttachment(unsigned int index, int value) const = 0;
+
 		//virtual FrameBufferSpecification& getSpecification() = 0;
 		virtual const FrameBufferSpecification& getSpecification() const = 0;
 		virtual unsigned int getColorAttachmentRendererID(unsigned int index = 0) const = 0;

@@ -7,6 +7,8 @@
 #include "GCE/Renderer/Texture.h"
 #include "GCE/Renderer/SubTexture2D.h"
 
+#include "GCE/Scene/Components.h"
+
 #include <glm/glm.hpp>
 
 namespace GCE
@@ -72,14 +74,16 @@ namespace GCE
 		static void drawQuad
 		(
 			const glm::mat4& transform, 
-			const glm::vec4& color
+			const glm::vec4& color,
+			int entityID = -1
 		);
 		static void drawQuad
 		(
 			const glm::mat4& transform,
 			const Ref<Texture2D>& texture,
 			int textureScale = 1,
-			const glm::vec4& color = glm::vec4(1.0f)
+			const glm::vec4& color = glm::vec4(1.0f),
+			int entityID = -1
 		);
 		static void drawQuadRotated
 		(
@@ -129,6 +133,8 @@ namespace GCE
 			const Ref<SubTexture2D>& subTexture,
 			const glm::vec4& color = glm::vec4(1.0f)
 		);
+
+		static void drawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID);
 
 		//Statistics
 		struct Statistics

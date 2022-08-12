@@ -18,6 +18,7 @@ namespace GCE
 		void onImGuiRender();
 
 		Entity getSelectedEntity() { return m_SelectionContext; }
+		void setSelectedEntity(Entity pressedEntity) { m_SelectionContext = pressedEntity; }
 
 	private:
 		void drawEntityNode(Entity entity);

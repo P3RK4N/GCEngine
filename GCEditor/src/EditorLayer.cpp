@@ -92,7 +92,7 @@ namespace GCE
 			m_EditorCamera.setViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 		}
 
-		if (m_ViewportFocused || m_ViewportHovered)
+		if ((m_ViewportFocused || m_ViewportHovered) && !ImGuizmo::IsUsing())
 		{
 			m_EditorCamera.onUpdate(ts);
 		}
@@ -104,11 +104,13 @@ namespace GCE
 		RenderCommand::setClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		RenderCommand::clear();
 
+		m_FrameBuffer->clearColorAttachment(1,-1);
+
 		m_Scene->onUpdateEditor(ts, m_EditorCamera);
 
 		auto[mx, my] = ImGui::GetMousePos();
 		mx -= m_ViewportBounds[0].x;
-		mx -= m_ViewportBounds[0].y;
+		my -= m_ViewportBounds[0].y;
 		glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
 
 		//Flip
@@ -120,6 +122,7 @@ namespace GCE
 		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
 		{
 			int pixelData = m_FrameBuffer->readPixel(1, mouseX, mouseY);
+			m_HoveredEntity = pixelData == -1 ? Entity{} : Entity{ (entt::entity)pixelData, m_Scene.get() };
 		}
 
 		m_FrameBuffer->unbind();
@@ -219,6 +222,7 @@ namespace GCE
 
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<KeyPressedEvent>(GCE_BIND_EVENT_FN(EditorLayer::onKeyPressed));
+		dispatcher.Dispatch<MouseButtonPressedEvent>(GCE_BIND_EVENT_FN(EditorLayer::onMouseButtonPressed));
 	}
 
 	bool EditorLayer::onKeyPressed(KeyPressedEvent& e)
@@ -262,6 +266,16 @@ namespace GCE
 		}
 	}
 
+	bool EditorLayer::onMouseButtonPressed(MouseButtonPressedEvent& e)
+	{
+		if (e.getMouseButton() == GCE_MOUSE_BUTTON_LEFT && !ImGuizmo::IsOver() && !Input::isKeyPressed(GCE_KEY_LEFT_ALT))
+		{
+			if (m_ViewportHovered)
+				m_SceneHierarchyPanel.setSelectedEntity(m_HoveredEntity);
+		}
+		return false;
+	}
+
 	void EditorLayer::newScene()
 	{
 		m_Scene = createRef<Scene>();
@@ -297,6 +311,9 @@ namespace GCE
 	{
 		ImGui::Begin("Statistics");
 
+		std::string hoveredEntity = !m_HoveredEntity ? "None" : m_HoveredEntity.getComponent<TagComponent>().tag;
+		ImGui::Text("Hovered Entity: %s", hoveredEntity.c_str());
+
 		auto stats = Renderer2D::getStats();
 		ImGui::Text("Renderer2D stats:");
 		ImGui::Text("Draw calls: %d", stats.drawCalls);
@@ -313,7 +330,13 @@ namespace GCE
 		ImGui::Begin("Viewport");
 		ImGui::PopStyleVar();
 
-		auto viewportOffset = ImGui::GetCursorPos();
+		//Mouse picking
+		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+		auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+		auto viewportOffset = ImGui::GetWindowPos();
+		m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
+		m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
+
 
 		m_ViewportFocused = ImGui::IsWindowFocused();
 		m_ViewportHovered = ImGui::IsWindowHovered();
@@ -324,16 +347,6 @@ namespace GCE
 
 		unsigned int textureID = m_FrameBuffer->getColorAttachmentRendererID();
 		ImGui::Image((void*)textureID, ImVec2(m_ViewportSize.x, m_ViewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
-
-		//Mouse picking
-		auto windowSize = ImGui::GetWindowSize();
-		ImVec2 minBound = ImGui::GetWindowPos();
-		minBound.x += viewportOffset.x;
-		minBound.y += viewportOffset.y;
-		ImVec2 maxBound = { minBound.x + windowSize.x, minBound.y + windowSize.y };
-
-		m_ViewportBounds[0] = { minBound.x, minBound.y };
-		m_ViewportBounds[1] = { maxBound.x, maxBound.y };
 
 
 		drawGuizmo();
@@ -350,9 +363,7 @@ namespace GCE
 			ImGuizmo::SetOrthographic(false);
 			ImGuizmo::SetDrawlist();
 
-			float windowWidth = (float)ImGui::GetWindowWidth();
-			float windowHeight = (float)ImGui::GetWindowHeight();
-			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+			ImGuizmo::SetRect(m_ViewportBounds[0].x, m_ViewportBounds[0].y, m_ViewportBounds[1].x - m_ViewportBounds[0].x, m_ViewportBounds[1].y - m_ViewportBounds[0].y);
 
 			//Camera
 #if SceneCamera

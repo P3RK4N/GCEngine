@@ -75,6 +75,18 @@ namespace GCE
 
 			glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, textureTarget(multisampled), id, 0);
 		}
+
+		static GLenum GCEtexFormatToGL(FramebufferTextureFormat format)
+		{
+			switch (format)
+			{
+			case FramebufferTextureFormat::RGBA8:		return GL_RGBA8;
+			case FramebufferTextureFormat::RED_INTEGER: return GL_RED_INTEGER;
+			}
+
+			GCE_CORE_ASSERT(false, "Invalid FramebufferTextureFormat");
+			return 0;
+		}
 	}
 
 	OpenGLFrameBuffer::OpenGLFrameBuffer(const FrameBufferSpecification& spec) :
@@ -124,6 +136,15 @@ namespace GCE
 		int pixelData;
 		glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixelData);
 		return pixelData;
+	}
+
+	void OpenGLFrameBuffer::clearColorAttachment(unsigned index, int value) const
+	{
+		GCE_CORE_ASSERT(index >= 0 && index < m_ColorAttachments.size(), "Invalid index");
+
+		auto& spec = m_ColorAttachmentSpecifications[index];
+
+		glClearTexImage(m_ColorAttachments[index], 0, Utils::GCEtexFormatToGL(spec.textureFormat), GL_INT, &value);
 	}
 
 	void OpenGLFrameBuffer::Invalidate()

@@ -17,6 +17,9 @@ namespace GCE
 		glm::vec2 uv;
 		float texIndex;
 		float textureScale;
+
+		//Editor only
+		int entityID;
 	};
 
 	struct Renderer2DData
@@ -59,7 +62,8 @@ namespace GCE
 			{ ShaderDataType::Float4, "a_Color" }, 
 			{ ShaderDataType::Float2, "a_UV" },
 			{ ShaderDataType::Float, "a_TextureIndex" },
-			{ ShaderDataType::Float, "a_TextureScale" }
+			{ ShaderDataType::Float, "a_TextureScale" },
+			{ ShaderDataType::Int, "a_EntityID" }
 		});
 
 		s_Data.quadVertexArray->addVertexBuffer(s_Data.quadVertexBuffer);
@@ -323,7 +327,7 @@ namespace GCE
 		s_Data.stats.quadCount++;
 	}
 
-	void Renderer2D::drawQuad(const glm::mat4& transform, const glm::vec4& color)
+	void Renderer2D::drawQuad(const glm::mat4& transform, const glm::vec4& color, int entityID)
 	{
 		GCE_PROFILE_FUNCTION();
 
@@ -342,6 +346,7 @@ namespace GCE
 			s_Data.quadVertexBufferPtr->uv = texCoords[i];
 			s_Data.quadVertexBufferPtr->texIndex = textureIndex;
 			s_Data.quadVertexBufferPtr->textureScale = textureScale;
+			s_Data.quadVertexBufferPtr->entityID = entityID;
 			s_Data.quadVertexBufferPtr++;
 		}
 
@@ -349,7 +354,7 @@ namespace GCE
 		s_Data.stats.quadCount++;
 	}
 
-	void Renderer2D::drawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, int textureScale, const glm::vec4& color)
+	void Renderer2D::drawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, int textureScale, const glm::vec4& color, int entityID)
 	{
 		GCE_PROFILE_FUNCTION();
 
@@ -387,6 +392,7 @@ namespace GCE
 			s_Data.quadVertexBufferPtr->uv = texCoords[i];
 			s_Data.quadVertexBufferPtr->texIndex = textureIndex;
 			s_Data.quadVertexBufferPtr->textureScale = textureScale;
+			s_Data.quadVertexBufferPtr->entityID = entityID;
 			s_Data.quadVertexBufferPtr++;
 		}
 
@@ -530,6 +536,11 @@ namespace GCE
 
 		s_Data.quadIndexCount += 6;
 		s_Data.stats.quadCount++;
+	}
+
+	void Renderer2D::drawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID)
+	{
+		drawQuad(transform, src.color, entityID);
 	}
 
 	Renderer2D::Statistics Renderer2D::getStats()

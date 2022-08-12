@@ -15,6 +15,8 @@ namespace GCE
 		virtual const FrameBufferSpecification& getSpecification() const override { return m_Specification; }
 		virtual unsigned int getColorAttachmentRendererID(unsigned int index = 0) const { GCE_CORE_ASSERT(index >= 0 && index < m_ColorAttachments.size(), "Invalid index"); return m_ColorAttachments[index]; }
 
+		virtual void clearColorAttachment(unsigned index, int value) const override;
+
 		virtual void resize(unsigned int width, unsigned int height) override;
 		virtual int readPixel(unsigned attachmentIndex, int x, int y) override;
 
