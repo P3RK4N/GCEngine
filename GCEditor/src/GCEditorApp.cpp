@@ -7,8 +7,8 @@ namespace GCE
 	class GCEditor : public Application
 	{
 	public:
-		GCEditor() :
-			Application("GCEditor")
+		GCEditor(ApplicationCommandLineArgs args) :
+			Application("GCEditor", args)
 		{
 			pushLayer(new EditorLayer());
 		}
@@ -19,8 +19,8 @@ namespace GCE
 		}
 	};
 
-	Application* createApplication()
+	Application* createApplication(ApplicationCommandLineArgs args)
 	{
-		return new GCEditor();
+		return new GCEditor(args);
 	}
 }

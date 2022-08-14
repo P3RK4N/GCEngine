@@ -19,6 +19,9 @@
     <Filter Include="src\GCE\ImGui">
       <UniqueIdentifier>{D5CF0F88-4190-8BBE-0ACB-D43B764AD09A}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\GCE\Math">
+      <UniqueIdentifier>{24965FFC-10F9-EEA0-B97E-2757A5C0BA23}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\GCE\Renderer">
       <UniqueIdentifier>{7122EA73-5D1B-09C6-864D-EE4A72A5E8D1}</UniqueIdentifier>
     </Filter>
@@ -72,6 +75,9 @@
     <ClInclude Include="src\GCE\Core\Application.h">
       <Filter>src\GCE\Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\GCE\Core\Assert.h">
+      <Filter>src\GCE\Core</Filter>
+    </ClInclude>
     <ClInclude Include="src\GCE\Core\Core.h">
       <Filter>src\GCE\Core</Filter>
     </ClInclude>
@@ -94,6 +100,12 @@
       <Filter>src\GCE\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\GCE\Core\MouseButtonCodes.h">
+      <Filter>src\GCE\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GCE\Core\PlatformDetection.h">
+      <Filter>src\GCE\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GCE\Core\Timer.h">
       <Filter>src\GCE\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\GCE\Core\Timestep.h">
@@ -120,10 +132,16 @@
     <ClInclude Include="src\GCE\ImGui\ImGuiLayer.h">
       <Filter>src\GCE\ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="src\GCE\Math\Math.h">
+      <Filter>src\GCE\Math</Filter>
+    </ClInclude>
     <ClInclude Include="src\GCE\Renderer\Buffer.h">
       <Filter>src\GCE\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\GCE\Renderer\Camera.h">
+      <Filter>src\GCE\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GCE\Renderer\EditorCamera.h">
       <Filter>src\GCE\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\GCE\Renderer\FrameBuffer.h">
@@ -157,6 +175,9 @@
       <Filter>src\GCE\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\GCE\Renderer\Texture.h">
+      <Filter>src\GCE\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GCE\Renderer\UniformBuffer.h">
       <Filter>src\GCE\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\GCE\Renderer\VertexArray.h">
@@ -202,6 +223,9 @@
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLTexture.h">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLUniformBuffer.h">
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLVertexArray.h">
@@ -1461,8 +1485,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\GCE\Math\Math.h" />
-    <ClInclude Include="src\GCE\Renderer\EditorCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GCE\Core\Application.cpp">
@@ -1483,7 +1505,13 @@
     <ClCompile Include="src\GCE\ImGui\ImGuiLayer.cpp">
       <Filter>src\GCE\ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="src\GCE\Math\Math.cpp">
+      <Filter>src\GCE\Math</Filter>
+    </ClCompile>
     <ClCompile Include="src\GCE\Renderer\Buffer.cpp">
+      <Filter>src\GCE\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GCE\Renderer\EditorCamera.cpp">
       <Filter>src\GCE\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\GCE\Renderer\FrameBuffer.cpp">
@@ -1514,6 +1542,9 @@
       <Filter>src\GCE\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\GCE\Renderer\Texture.cpp">
+      <Filter>src\GCE\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GCE\Renderer\UniformBuffer.cpp">
       <Filter>src\GCE\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\GCE\Renderer\VertexArray.cpp">
@@ -1552,6 +1583,9 @@
     <ClCompile Include="src\Platform\OpenGL\OpenGLTexture.cpp">
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLUniformBuffer.cpp">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLVertexArray.cpp">
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
@@ -1570,7 +1604,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\GCE\Math\Math.cpp" />
-    <ClCompile Include="src\GCE\Renderer\EditorCamera.cpp" />
   </ItemGroup>
 </Project>

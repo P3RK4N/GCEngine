@@ -12,10 +12,23 @@
 
 namespace GCE
 {
+	struct ApplicationCommandLineArgs
+	{
+		int count = 0;
+		char** args = nullptr;
+
+		const char* operator[](int index) const
+		{
+			GCE_CORE_ASSERT(0 <= index && index < count, "Invalid index");
+
+			return args[index];
+		}
+	};
+
 	class GCE_API Application
 	{
 	public:
-		Application(const std::string& name = "GCEngine");
+		Application(const std::string& name = "GCEngine", ApplicationCommandLineArgs args = ApplicationCommandLineArgs());
 		virtual ~Application();
 
 		void Run();
@@ -32,11 +45,14 @@ namespace GCE
 	public:
 		inline static Application* get() { return s_Instance; }
 
+		ApplicationCommandLineArgs getCommandLineArgs() const { return m_CommandLineArgs; }
+
 	private:
 		bool onWindowClose(WindowCloseEvent& e);
 		bool onWindowResize(WindowResizeEvent& e);
 
 	private:
+		ApplicationCommandLineArgs m_CommandLineArgs;
 		Scope<Window> m_Window;
 
 		bool m_Running = true;
@@ -51,6 +67,6 @@ namespace GCE
 		static Application* s_Instance;
 	};
 
-	Application* createApplication();
+	Application* createApplication(ApplicationCommandLineArgs args);
 }
 

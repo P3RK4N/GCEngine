@@ -56,21 +56,19 @@ namespace GCE
 		spec.width = 1280;
 		spec.height = 720;
 		spec.attachmentSpecification = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth };
+
 		m_FrameBuffer = FrameBuffer::create(spec);
-
 		m_Scene = createRef<Scene>();
-
 		m_EditorCamera = EditorCamera(45.0f, 1.778f, 0.01f, 1000.0f);
-
-		/*m_Entity = m_Scene->createEntity("Square");
-		m_Entity.addComponent<SpriteRendererComponent>(glm::vec4(0.0f, 1.0f, 0.2f, 1.0f));
-
-		m_Camera = m_Scene->createEntity("Camera");
-		m_Camera.addComponent<CameraComponent>();
-
-		m_Camera.addComponent<NativeScriptComponent>().bind<CameraController>();*/
-
 		m_SceneHierarchyPanel.setContext(m_Scene);
+
+		auto commandLineArgs = Application::get()->getCommandLineArgs();
+		if (commandLineArgs.count > 1)
+		{
+			auto sceneFilePath = commandLineArgs[1];
+			SceneSerializer serializer(m_Scene);
+			serializer.deserialize(sceneFilePath);
+		}
 	}
 
 	void EditorLayer::onDetach()

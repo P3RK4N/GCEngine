@@ -31,6 +31,8 @@ namespace GCE
 
 	void SceneCamera::setViewportSize(unsigned int width, unsigned int height)
 	{
+		GCE_CORE_ASSERT(width > 0 && height > 0, "Cannot set viewport size to (0,0)");
+
 		m_AspectRatio = (float)width / (float)height;
 
 		recalculateProjection();

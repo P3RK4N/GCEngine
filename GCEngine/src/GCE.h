@@ -5,6 +5,7 @@
 #include "GCE/Core/Application.h"
 #include "GCE/Core/Layer.h"
 #include "GCE/Core/Log.h"
+#include "GCE/Core/Assert.h"
 
 #include "GCE/Core/Timestep.h"
 

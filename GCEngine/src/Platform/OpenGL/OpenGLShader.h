@@ -40,10 +40,19 @@ namespace GCE
 	private:
 		unsigned int m_RendererID;
 		std::string m_Name;
+		std::string m_FilePath;
+
+		std::unordered_map<GLenum, std::vector<unsigned>> m_VulkanSPIRV;
+		std::unordered_map<GLenum, std::vector<unsigned>> m_OpenGLSPIRV;
+		std::unordered_map<GLenum, std::string> m_OpenGLSourceCode;
 
 	private:
 		std::string readFile(const std::string& path);
 		std::unordered_map<GLenum, std::string> preProcess(const std::string& source);
-		void compile(const std::unordered_map<GLenum, std::string>& shaderSrc);
+
+		void compileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shaderSources);
+		void compileOrGetOpenGLBinaries();
+		void createProgram();
+		void reflect(GLenum stage, const std::vector<uint32_t>& shaderData);
 	};
 }

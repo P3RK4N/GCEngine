@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="..">
+      <UniqueIdentifier>{61705900-4DFC-870B-B6AA-880BA255880B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\GCEditor">
+      <UniqueIdentifier>{6133D252-CDE8-4A48-56DD-441FC291414C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\GCEngine">
+      <UniqueIdentifier>{B0E08553-1C96-FE48-A58A-F81F113FF54C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\GCEngine\vendor">
+      <UniqueIdentifier>{0DD1FFCF-F9B4-C025-6215-BB784E18ABA7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\GCEngine\vendor\GLFW">
+      <UniqueIdentifier>{6C3C584F-D873-A0E6-E17D-040A4D34C7DF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\GCEngine\vendor\Glad">
+      <UniqueIdentifier>{14C8584F-80FF-A0E6-8909-050AF5BFC7DF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\GCEngine\vendor\imgui">
+      <UniqueIdentifier>{37B4D93C-23D9-28BD-4C24-0E4D38A827DB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\GCEngine\vendor\yaml-cpp">
+      <UniqueIdentifier>{5FB6AA52-CBC3-D838-54AA-D423C0B6A4EF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\SandBox">
+      <UniqueIdentifier>{1FF36A1D-0BAB-AC6A-74B2-85C66089475B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\GCEditor\premake5.lua">
+      <Filter>..\GCEditor</Filter>
+    </None>
+    <None Include="..\..\GCEngine\premake5.lua">
+      <Filter>..\GCEngine</Filter>
+    </None>
+    <None Include="..\..\GCEngine\vendor\GLFW\premake5.lua">
+      <Filter>..\GCEngine\vendor\GLFW</Filter>
+    </None>
+    <None Include="..\..\GCEngine\vendor\Glad\premake5.lua">
+      <Filter>..\GCEngine\vendor\Glad</Filter>
+    </None>
+    <None Include="..\..\GCEngine\vendor\imgui\premake5.lua">
+      <Filter>..\GCEngine\vendor\imgui</Filter>
+    </None>
+    <None Include="..\..\GCEngine\vendor\yaml-cpp\premake5.lua">
+      <Filter>..\GCEngine\vendor\yaml-cpp</Filter>
+    </None>
+    <None Include="..\..\SandBox\premake5.lua">
+      <Filter>..\SandBox</Filter>
+    </None>
+    <None Include="..\..\premake5.lua">
+      <Filter>..</Filter>
+    </None>
+    <None Include="premake5.lua" />
+  </ItemGroup>
+</Project>
