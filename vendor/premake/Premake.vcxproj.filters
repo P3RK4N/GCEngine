@@ -13,6 +13,9 @@
     <Filter Include="..\GCEngine\vendor">
       <UniqueIdentifier>{0DD1FFCF-F9B4-C025-6215-BB784E18ABA7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="..\GCEngine\vendor\Box2D">
+      <UniqueIdentifier>{DB50193A-C775-68BA-F0C0-4D4ADC4467D8}</UniqueIdentifier>
+    </Filter>
     <Filter Include="..\GCEngine\vendor\GLFW">
       <UniqueIdentifier>{6C3C584F-D873-A0E6-E17D-040A4D34C7DF}</UniqueIdentifier>
     </Filter>
@@ -35,6 +38,9 @@
     </None>
     <None Include="..\..\GCEngine\premake5.lua">
       <Filter>..\GCEngine</Filter>
+    </None>
+    <None Include="..\..\GCEngine\vendor\Box2D\premake5.lua">
+      <Filter>..\GCEngine\vendor\Box2D</Filter>
     </None>
     <None Include="..\..\GCEngine\vendor\GLFW\premake5.lua">
       <Filter>..\GCEngine\vendor\GLFW</Filter>

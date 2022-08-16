@@ -16,6 +16,7 @@ group "Dependencies"
     include "GCEngine/vendor/Glad"
     include "GCEngine/vendor/imgui"
     include "GCEngine/vendor/yaml-cpp"
+    include "GCEngine/vendor/Box2D"
 group ""
 
 include "GCEngine"

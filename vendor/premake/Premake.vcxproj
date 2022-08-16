@@ -79,6 +79,7 @@
   <ItemGroup>
     <None Include="..\..\GCEditor\premake5.lua" />
     <None Include="..\..\GCEngine\premake5.lua" />
+    <None Include="..\..\GCEngine\vendor\Box2D\premake5.lua" />
     <None Include="..\..\GCEngine\vendor\GLFW\premake5.lua" />
     <None Include="..\..\GCEngine\vendor\Glad\premake5.lua" />
     <None Include="..\..\GCEngine\vendor\imgui\premake5.lua" />

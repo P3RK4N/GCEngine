@@ -26,6 +26,8 @@ namespace GCE
 			return m_RendererID == ((OpenGLTexture2D&)other).m_RendererID;
 		}
 
+		const std::string& getPath() const { return m_Path; }
+
 	private:
 		std::string m_Path;
 		unsigned int m_Width, m_Height;

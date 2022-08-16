@@ -2,9 +2,30 @@ Scene: Untitled
 Entities:
   - Entity: 123412343212
     TagComponent:
+      Tag: Floor
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [27.7999992, 1.89999998, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 0, 1]
+      Texture: ""
+      TextureScale: 1
+    Rigidbody2DComponent:
+      BodyType: Static
+      FixedRotation: true
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0.5
+      RestitutionThreshold: 0.5
+  - Entity: 123412343212
+    TagComponent:
       Tag: Camera
     TransformComponent:
-      Position: [0, 0, 4.69999981]
+      Position: [0, 5.01196575, 31.4016876]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     CameraComponent:
@@ -22,8 +43,20 @@ Entities:
     TagComponent:
       Tag: Quad
     TransformComponent:
-      Position: [0, 0, 0]
+      Position: [-0.303680569, 10.9459076, 0]
       Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
+      Scale: [4.99997616, 4.99997616, 5]
     SpriteRendererComponent:
       Color: [0.0549019612, 1, 0.192156866, 1]
+      Texture: assets\textures\flowerPattern.jpg
+      TextureScale: 1
+    Rigidbody2DComponent:
+      BodyType: Dynamic
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0.370000005
+      RestitutionThreshold: 0.289999992

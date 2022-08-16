@@ -10,6 +10,7 @@ IncludeDir["stb_image"] = "%{wks.location}/GCEngine/vendor/stb_image"
 IncludeDir["entt"] = "%{wks.location}/GCEngine/vendor/entt/include"
 IncludeDir["yaml_cpp"] = "%{wks.location}/GCEngine/vendor/yaml-cpp/include"
 IncludeDir["ImGuizmo"] = "%{wks.location}/GCEngine/vendor/ImGuizmo"
+IncludeDir["Box2D"] = "%{wks.location}/GCEngine/vendor/Box2D/include"
 
 IncludeDir["shaderc"] = "%{wks.location}/GCEngine/vendor/shaderc/include"
 IncludeDir["SPIRV_Cross"] = "%{wks.location}/GCEngine/vendor/SPIRV_Cross"

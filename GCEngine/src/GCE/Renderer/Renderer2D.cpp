@@ -230,12 +230,12 @@ namespace GCE
 		s_Data.stats.quadCount++;
 	}
 
-	void Renderer2D::drawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, int textureScale, const glm::vec4& color)
+	void Renderer2D::drawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, float textureScale, const glm::vec4& color)
 	{
 		drawQuad({ position.x, position.y, 0.0f }, size, texture, textureScale, color);
 	}
 
-	void Renderer2D::drawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, int textureScale, const glm::vec4& color)
+	void Renderer2D::drawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, float textureScale, const glm::vec4& color)
 	{
 		GCE_PROFILE_FUNCTION();
 
@@ -363,7 +363,7 @@ namespace GCE
 		s_Data.stats.quadCount++;
 	}
 
-	void Renderer2D::drawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, int textureScale, const glm::vec4& color, int entityID)
+	void Renderer2D::drawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, float textureScale, const glm::vec4& color, int entityID)
 	{
 		GCE_PROFILE_FUNCTION();
 
@@ -442,12 +442,12 @@ namespace GCE
 		s_Data.stats.quadCount++;
 	}
 
-	void Renderer2D::drawQuadRotated(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, int textureScale, const glm::vec4& color)
+	void Renderer2D::drawQuadRotated(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float textureScale, const glm::vec4& color)
 	{
 		drawQuadRotated({ position.x, position.y, 0.0f }, size, rotation, texture, textureScale, color);
 	}
 
-	void Renderer2D::drawQuadRotated(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, int textureScale, const glm::vec4& color)
+	void Renderer2D::drawQuadRotated(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float textureScale, const glm::vec4& color)
 	{
 		GCE_PROFILE_FUNCTION();
 
@@ -549,7 +549,10 @@ namespace GCE
 
 	void Renderer2D::drawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID)
 	{
-		drawQuad(transform, src.color, entityID);
+		if (src.texture)
+			drawQuad(transform, src.texture, src.textureScale, src.color, entityID);
+		else
+			drawQuad(transform, src.color, entityID);
 	}
 
 	Renderer2D::Statistics Renderer2D::getStats()

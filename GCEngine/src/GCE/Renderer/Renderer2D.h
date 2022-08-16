@@ -46,7 +46,7 @@ namespace GCE
 			const glm::vec2& position,
 			const glm::vec2& size,
 			const Ref<Texture2D>& texture,
-			int textureScale = 1,
+			float textureScale = 1,
 			const glm::vec4& color = glm::vec4(1.0f)
 		);
 		static void drawQuad
@@ -54,7 +54,7 @@ namespace GCE
 			const glm::vec3& position,
 			const glm::vec2& size,
 			const Ref<Texture2D>& texture,
-			int textureScale = 1,
+			float textureScale = 1,
 			const glm::vec4& color = glm::vec4(1.0f)
 		);
 		static void drawQuad
@@ -81,7 +81,7 @@ namespace GCE
 		(
 			const glm::mat4& transform,
 			const Ref<Texture2D>& texture,
-			int textureScale = 1,
+			float textureScale = 1,
 			const glm::vec4& color = glm::vec4(1.0f),
 			int entityID = -1
 		);
@@ -105,7 +105,7 @@ namespace GCE
 			const glm::vec2& size,
 			float rotation,
 			const Ref<Texture2D>& texture,
-			int textureScale = 1,
+			float textureScale = 1,
 			const glm::vec4& color = glm::vec4(1.0f)
 		);
 		static void drawQuadRotated
@@ -114,7 +114,7 @@ namespace GCE
 			const glm::vec2& size,
 			float rotation,
 			const Ref<Texture2D>& texture,
-			int textureScale = 1,
+			float textureScale = 1,
 			const glm::vec4& color = glm::vec4(1.0f)
 		);
 		static void drawQuadRotated

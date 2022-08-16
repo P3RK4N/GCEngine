@@ -2,6 +2,7 @@
 #include "GCE.h"
 
 #include "Panels/SceneHierarchyPanel.h"
+#include "Panels/ContentBrowserPanel.h"
 
 namespace GCE
 {
@@ -29,11 +30,16 @@ namespace GCE
 
 		void newScene();
 		void openScene();
+		void openScene(const std::filesystem::path& path);
 		void saveScene();
 
-	private:
+		void onScenePlay();
+		void onSceneStop();
 
-		//TEMP
+		//UI
+		void UI_Toolbar();
+
+	private:
 		Ref<FrameBuffer> m_FrameBuffer;
 
 		glm::vec2 m_ViewportSize = {0, 0};
@@ -52,6 +58,15 @@ namespace GCE
 
 		//Panels
 		SceneHierarchyPanel m_SceneHierarchyPanel;
+		ContentBrowserPanel m_ContentBrowserPanel;
 
+		enum class SceneState
+		{
+			Edit = 0, Play = 1
+		};
+
+		Ref<Texture2D> m_IconPlay, m_IconStop;
+
+		SceneState m_SceneState = SceneState::Edit;
 	};
 }

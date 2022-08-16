@@ -5,6 +5,8 @@
 
 #include <entt.hpp>
 
+class b2World;
+
 namespace GCE
 {
 	class Entity;
@@ -18,6 +20,9 @@ namespace GCE
 
 		Entity createEntity(const std::string& name = "");
 		void destroyEntity(Entity entity);
+
+		void onRuntimeStart();
+		void onRuntimeStop();
 
 		void onUpdateEditor(Timestep ts, EditorCamera& camera);
 		void onUpdateRuntime(Timestep ts);
@@ -36,6 +41,8 @@ namespace GCE
 
 		unsigned int m_ViewportWidth;
 		unsigned int m_ViewportHeight;
+
+		b2World* m_PhysicsWorld = nullptr;
 
 		friend class Entity;
 		friend class SceneHierarchyPanel;

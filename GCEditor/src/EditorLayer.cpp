@@ -42,6 +42,8 @@ namespace GCE
 		}
 	};
 
+	extern const std::filesystem::path g_AssetPath = "assets";
+
 	EditorLayer::EditorLayer() :
 		Layer("EditorLayer")
 	{
@@ -51,6 +53,9 @@ namespace GCE
 	void EditorLayer::onAttach()
 	{
 		GCE_PROFILE_FUNCTION();
+
+		m_IconPlay = Texture2D::create("resources/icons/Play.png");
+		m_IconStop = Texture2D::create("resources/icons/Stop.png");
 
 		FrameBufferSpecification spec;
 		spec.width = 1280;
@@ -90,10 +95,6 @@ namespace GCE
 			m_EditorCamera.setViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 		}
 
-		if ((m_ViewportFocused || m_ViewportHovered) && !ImGuizmo::IsUsing())
-		{
-			m_EditorCamera.onUpdate(ts);
-		}
 
 		//Render
 		m_FrameBuffer->bind();
@@ -104,7 +105,24 @@ namespace GCE
 
 		m_FrameBuffer->clearColorAttachment(1,-1);
 
-		m_Scene->onUpdateEditor(ts, m_EditorCamera);
+		switch (m_SceneState)
+		{
+			case SceneState::Edit:
+				{
+					if ((m_ViewportFocused || m_ViewportHovered) && !ImGuizmo::IsUsing())
+					{
+						m_EditorCamera.onUpdate(ts);
+					}
+					m_Scene->onUpdateEditor(ts, m_EditorCamera);
+					break;
+				}
+			case SceneState::Play:
+				{
+					m_Scene->onUpdateRuntime(ts);
+					break;
+				}
+		}
+
 
 		auto[mx, my] = ImGui::GetMousePos();
 		mx -= m_ViewportBounds[0].x;
@@ -207,10 +225,43 @@ namespace GCE
 		}
 
 		m_SceneHierarchyPanel.onImGuiRender();
+		m_ContentBrowserPanel.onImGuiRender();
 
 		drawStats();
 		drawViewport();
 
+		UI_Toolbar();
+
+		ImGui::End();
+	}
+
+	void EditorLayer::UI_Toolbar()
+	{
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+		auto& colors = ImGui::GetStyle().Colors;
+		auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
+		auto& buttonActive = colors[ImGuiCol_ButtonActive];
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
+
+		ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+
+		float size = ImGui::GetWindowHeight() - 4.0f;
+		Ref<Texture2D> icon = m_SceneState == SceneState::Edit ? m_IconPlay : m_IconStop;
+
+		ImGui::SameLine((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+
+		if (ImGui::ImageButton((ImTextureID)icon->getRendererID(), ImVec2{ size, size }, ImVec2(0, 0), ImVec2(1, 1), 0))
+		{
+			if (m_SceneState == SceneState::Edit)
+				onScenePlay();
+			else if (m_SceneState == SceneState::Play)
+				onSceneStop();
+		}
+		ImGui::PopStyleVar(2);
+		ImGui::PopStyleColor(3);
 		ImGui::End();
 	}
 
@@ -285,14 +336,18 @@ namespace GCE
 	{
 		std::string filePath = FileDialogs::openFile("GCE Scene (*.gce)\0*.gce\0");
 		if(!filePath.empty())
-		{
-			m_Scene = createRef<Scene>();
-			m_Scene->onViewportResize((unsigned int)m_ViewportSize.x, (unsigned int)m_ViewportSize.y);
-			m_SceneHierarchyPanel.setContext(m_Scene);
+			openScene(filePath);
+	}
 
-			SceneSerializer serializer(m_Scene);
-			serializer.deserialize(filePath);
-		}
+	void EditorLayer::openScene(const std::filesystem::path& filePath)
+	{
+		m_Scene = createRef<Scene>();
+		m_Scene->onViewportResize((unsigned int)m_ViewportSize.x, (unsigned int)m_ViewportSize.y);
+		m_SceneHierarchyPanel.setContext(m_Scene);
+
+		SceneSerializer serializer(m_Scene);
+		serializer.deserialize(filePath.string());
+		
 	}
 
 	void EditorLayer::saveScene()
@@ -346,8 +401,18 @@ namespace GCE
 		unsigned int textureID = m_FrameBuffer->getColorAttachmentRendererID();
 		ImGui::Image((void*)textureID, ImVec2(m_ViewportSize.x, m_ViewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
 
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENE_ASSET"))
+			{
+				const wchar_t* path = (const wchar_t*)payload->Data;
+				openScene(std::filesystem::path(g_AssetPath / path));
+			}
+			ImGui::EndDragDropTarget();
+		}
 
-		drawGuizmo();
+		if (m_SceneState == SceneState::Edit)
+			drawGuizmo();
 
 		ImGui::End();
 	}
@@ -406,6 +471,18 @@ namespace GCE
 				entityTransformComponent.scale = scale;
 			}
 		}
+	}
+
+	void EditorLayer::onScenePlay()
+	{
+		m_SceneState = SceneState::Play;
+		m_Scene->onRuntimeStart();
+	}
+
+	void EditorLayer::onSceneStop()
+	{
+		m_SceneState = SceneState::Edit;
+		m_Scene->onRuntimeStop();
 	}
 
 }

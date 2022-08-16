@@ -8,6 +8,7 @@
 
 namespace GCE
 {
+	extern const std::filesystem::path g_AssetPath;
 
 	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& scene)
 	{
@@ -253,18 +254,38 @@ namespace GCE
 
 		if (ImGui::BeginPopup("AddComponent"))
 		{
-			if (ImGui::MenuItem("Camera"))
+			if(!m_SelectionContext.hasComponent<CameraComponent>())
 			{
-				m_SelectionContext.addComponent<CameraComponent>();
-				ImGui::CloseCurrentPopup();
+				if (ImGui::MenuItem("Camera"))
+				{
+					m_SelectionContext.addComponent<CameraComponent>();
+					ImGui::CloseCurrentPopup();
+				}
 			}
-
-			if (ImGui::MenuItem("Sprite Renderer"))
+			if(!m_SelectionContext.hasComponent<SpriteRendererComponent>())
 			{
-				m_SelectionContext.addComponent<SpriteRendererComponent>();
-				ImGui::CloseCurrentPopup();
+				if (ImGui::MenuItem("Sprite Renderer"))
+				{
+					m_SelectionContext.addComponent<SpriteRendererComponent>();
+					ImGui::CloseCurrentPopup();
+				}
 			}
-
+			if(!m_SelectionContext.hasComponent<Rigidbody2DComponent>())
+			{
+				if (ImGui::MenuItem("Rigidbody 2D"))
+				{
+					m_SelectionContext.addComponent<Rigidbody2DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			if(!m_SelectionContext.hasComponent<BoxCollider2DComponent>())
+			{
+				if (ImGui::MenuItem("Box Collider 2D"))
+				{
+					m_SelectionContext.addComponent<BoxCollider2DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
 
 			ImGui::EndPopup();
 		}
@@ -347,6 +368,55 @@ namespace GCE
 		drawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
 		{
 			ImGui::ColorEdit4("Color", glm::value_ptr(component.color));
+
+			ImGui::Button("Texture", ImVec2{100.0f, 0.0f});
+			if (ImGui::BeginDragDropTarget())
+			{
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TEXTURE_ASSET"))
+				{
+					const wchar_t* path = (const wchar_t*)payload->Data;
+					std::filesystem::path texturePath = std::filesystem::path(g_AssetPath) / path;
+					component.texture = Texture2D::create(texturePath.string());
+				}
+				ImGui::EndDragDropTarget();
+			}
+
+			ImGui::DragFloat("Texture Scale", &component.textureScale, 0.1f, 0.01f, 100.0f);
+		});
+
+		drawComponent<Rigidbody2DComponent>("Rigidbody 2D", entity, [](auto& component)
+		{
+			const char* bodyTypeStrings[] = { "Static", "Dynamic", "Kinematic" };
+			const char* currentBodyTypeString = bodyTypeStrings[(int)component.type];
+			if (ImGui::BeginCombo("BodyType", currentBodyTypeString))
+			{
+				for (int i = 0; i < 3; i++)
+				{
+					bool isSelected = currentBodyTypeString == bodyTypeStrings[i];
+					if (ImGui::Selectable(bodyTypeStrings[i], isSelected))
+					{
+						currentBodyTypeString = bodyTypeStrings[i];
+						component.type = (Rigidbody2DComponent::BodyType)i;
+					}
+
+					if (isSelected)
+						ImGui::SetItemDefaultFocus();
+				}
+
+				ImGui::EndCombo();
+			}
+
+			ImGui::Checkbox("Fixed Rotation", &component.fixedRotation);
+		});
+
+		drawComponent<BoxCollider2DComponent>("Box Collider 2D", entity, [](auto& component)
+		{
+			ImGui::DragFloat2("Offset", glm::value_ptr(component.offset));
+			ImGui::DragFloat2("Size", glm::value_ptr(component.size));
+			ImGui::DragFloat("Density", &component.density, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("Friction", &component.friction, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("Restitution", &component.restitution, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("Restitution Threshold", &component.restitutionThreshold, 0.01f, 0.0f);
 		});
 	}
 

@@ -19,3 +19,6 @@
 [submodule "GCEngine/vendor/ImGuizmo"]
 	path = GCEngine/vendor/ImGuizmo
 	url = https://github.com/thecherno/imguizmo
+[submodule "GCEngine/vendor/Box2D"]
+	path = GCEngine/vendor/Box2D
+	url = https://github.com/theCherno/box2d
