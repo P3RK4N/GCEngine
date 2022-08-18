@@ -25,24 +25,26 @@ namespace GCE
 	{
 		ImGui::Begin("Scene Hierarchy");
 
-		m_Context->m_Registry.each([&](auto entityID)
+		if (m_Context)
 		{
-			Entity entity{ entityID, m_Context.get() };
-			drawEntityNode(entity);
-		});
+			m_Context->m_Registry.each([&](auto entityID)
+			{
+				Entity entity{ entityID, m_Context.get() };
+				drawEntityNode(entity);
+			});
 
-		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
-			m_SelectionContext = {};
+			if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
+				m_SelectionContext = {};
 
-		//Right click blank space
-		if (ImGui::BeginPopupContextWindow(0, 1, false))
-		{
-			if (ImGui::MenuItem("Create Empty Entity"))
-				m_Context->createEntity("Empty Entity");
+			//Right click blank space
+			if (ImGui::BeginPopupContextWindow(0, 1, false))
+			{
+				if (ImGui::MenuItem("Create Empty Entity"))
+					m_Context->createEntity("Empty Entity");
 
-			ImGui::EndPopup();
+				ImGui::EndPopup();
+			}
 		}
-
 
 		ImGui::End();
 
@@ -270,6 +272,14 @@ namespace GCE
 					ImGui::CloseCurrentPopup();
 				}
 			}
+			if(!m_SelectionContext.hasComponent<CircleRendererComponent>())
+			{
+				if (ImGui::MenuItem("Circle Renderer"))
+				{
+					m_SelectionContext.addComponent<CircleRendererComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
 			if(!m_SelectionContext.hasComponent<Rigidbody2DComponent>())
 			{
 				if (ImGui::MenuItem("Rigidbody 2D"))
@@ -382,6 +392,13 @@ namespace GCE
 			}
 
 			ImGui::DragFloat("Texture Scale", &component.textureScale, 0.1f, 0.01f, 100.0f);
+		});
+
+		drawComponent<CircleRendererComponent>("Circle Renderer", entity, [](auto& component)
+		{
+			ImGui::ColorEdit4("Color", glm::value_ptr(component.color));
+			ImGui::DragFloat("Thickness", &component.thickness, 0.025f, 0.0f, 1.0f);
+			ImGui::DragFloat("Fade", &component.fade, 0.00025f, 0.0f, 1.0f);
 		});
 
 		drawComponent<Rigidbody2DComponent>("Rigidbody 2D", entity, [](auto& component)

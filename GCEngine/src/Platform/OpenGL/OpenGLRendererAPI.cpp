@@ -34,6 +34,19 @@ namespace GCE
 	void OpenGLRendererAPI::drawIndexed(const GCE::Ref<VertexArray>& vertexArray, unsigned int indexCount)
 	{
 		unsigned int count = indexCount ? indexCount : vertexArray->getIndexBuffer()->getCount();
+		vertexArray->bind();
 		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 	}
+
+	void OpenGLRendererAPI::drawLines(const Ref<VertexArray>& vertexArray, unsigned int vertexCount)
+	{
+		vertexArray->bind();
+		glDrawArrays(GL_LINES, 0, vertexCount);
+	}
+
+	void OpenGLRendererAPI::setLineWidth(float width)
+	{
+		glLineWidth(width);
+	}
+
 }

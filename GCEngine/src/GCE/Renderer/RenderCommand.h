@@ -27,6 +27,16 @@ namespace GCE
 			s_RendererAPI->drawIndexed(vertexArray, indexCount);
 		}
 
+		inline static void drawLines(const Ref<VertexArray>& vertexArray, unsigned int vertexCount)
+		{
+			s_RendererAPI->drawLines(vertexArray, vertexCount);
+		}
+
+		inline static void setLineWidth(float width)
+		{
+			s_RendererAPI->setLineWidth(width);
+		}
+
 		inline static void setViewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
 		{
 			s_RendererAPI->setViewport(x, y, width, height);

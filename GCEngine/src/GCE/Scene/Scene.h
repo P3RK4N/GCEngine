@@ -2,6 +2,7 @@
 
 #include "GCE/Core/Timestep.h"
 #include "GCE/Renderer/EditorCamera.h"
+#include "GCE/Core/UUID.h"
 
 #include <entt.hpp>
 
@@ -18,7 +19,10 @@ namespace GCE
 		Scene();
 		~Scene();
 
+		static Ref<Scene> copy(Ref<Scene> otherScene);
+
 		Entity createEntity(const std::string& name = "");
+		Entity createEntityWithUUID(UUID uuid, const std::string& name = "");
 		void destroyEntity(Entity entity);
 
 		void onRuntimeStart();
@@ -27,6 +31,8 @@ namespace GCE
 		void onUpdateEditor(Timestep ts, EditorCamera& camera);
 		void onUpdateRuntime(Timestep ts);
 		void onViewportResize(unsigned int width, unsigned int height);
+
+		void duplicateEntity(Entity entity);
 
 		Entity getPrimaryCamera();
 

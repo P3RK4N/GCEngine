@@ -63,15 +63,15 @@ namespace GCE
 		spec.attachmentSpecification = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth };
 
 		m_FrameBuffer = FrameBuffer::create(spec);
-		m_Scene = createRef<Scene>();
+		m_ActiveScene = createRef<Scene>();
 		m_EditorCamera = EditorCamera(45.0f, 1.778f, 0.01f, 1000.0f);
-		m_SceneHierarchyPanel.setContext(m_Scene);
+		m_SceneHierarchyPanel.setContext(m_ActiveScene);
 
 		auto commandLineArgs = Application::get()->getCommandLineArgs();
 		if (commandLineArgs.count > 1)
 		{
 			auto sceneFilePath = commandLineArgs[1];
-			SceneSerializer serializer(m_Scene);
+			SceneSerializer serializer(m_ActiveScene);
 			serializer.deserialize(sceneFilePath);
 		}
 	}
@@ -91,7 +91,7 @@ namespace GCE
 		if (m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && (spec.width != m_ViewportSize.x || spec.height != m_ViewportSize.y))
 		{
 			m_FrameBuffer->resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-			m_Scene->onViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_ActiveScene->onViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 			m_EditorCamera.setViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 		}
 
@@ -113,12 +113,12 @@ namespace GCE
 					{
 						m_EditorCamera.onUpdate(ts);
 					}
-					m_Scene->onUpdateEditor(ts, m_EditorCamera);
+					m_ActiveScene->onUpdateEditor(ts, m_EditorCamera);
 					break;
 				}
 			case SceneState::Play:
 				{
-					m_Scene->onUpdateRuntime(ts);
+					m_ActiveScene->onUpdateRuntime(ts);
 					break;
 				}
 		}
@@ -138,7 +138,7 @@ namespace GCE
 		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
 		{
 			int pixelData = m_FrameBuffer->readPixel(1, mouseX, mouseY);
-			m_HoveredEntity = pixelData == -1 ? Entity{} : Entity{ (entt::entity)pixelData, m_Scene.get() };
+			m_HoveredEntity = pixelData == -1 ? Entity{} : Entity{ (entt::entity)pixelData, m_ActiveScene.get() };
 		}
 
 		m_FrameBuffer->unbind();
@@ -215,7 +215,7 @@ namespace GCE
 
 				if (ImGui::MenuItem("Save as...", "Ctrl+Shift+S"))
 				{
-					saveScene();
+					saveSceneAs();
 				}
 
 				ImGui::EndMenu();
@@ -296,28 +296,36 @@ namespace GCE
 
 			case GCE_KEY_S:
 				if(control && shift)
+					saveSceneAs();
+				else if (control)
 					saveScene();
 				break;
 
+
+			case GCE_KEY_D:
+				if (control)
+					onDuplicateEntity();
+					break;
+
 			//Gizmos
-		case GCE_KEY_Q:
-			m_GizmoType = -1;
-			break;
-		case GCE_KEY_W:
-			m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
-			break;
-		case GCE_KEY_E:
-			m_GizmoType = ImGuizmo::OPERATION::ROTATE;
-			break;
-		case GCE_KEY_R:
-			m_GizmoType = ImGuizmo::OPERATION::SCALE;
-			break;
+			case GCE_KEY_Q:
+				m_GizmoType = -1;
+				break;
+			case GCE_KEY_W:
+				m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
+				break;
+			case GCE_KEY_E:
+				m_GizmoType = ImGuizmo::OPERATION::ROTATE;
+				break;
+			case GCE_KEY_R:
+				m_GizmoType = ImGuizmo::OPERATION::SCALE;
+				break;
 		}
 	}
 
 	bool EditorLayer::onMouseButtonPressed(MouseButtonPressedEvent& e)
 	{
-		if (e.getMouseButton() == GCE_MOUSE_BUTTON_LEFT && !ImGuizmo::IsOver() && !Input::isKeyPressed(GCE_KEY_LEFT_ALT))
+		if (e.getMouseButton() == GCE_MOUSE_BUTTON_LEFT && (!ImGuizmo::IsOver() || !m_SceneHierarchyPanel.getSelectedEntity()) && !Input::isKeyPressed(GCE_KEY_LEFT_ALT))
 		{
 			if (m_ViewportHovered)
 				m_SceneHierarchyPanel.setSelectedEntity(m_HoveredEntity);
@@ -325,11 +333,18 @@ namespace GCE
 		return false;
 	}
 
+	void EditorLayer::serializeScene(const Ref<Scene>& scene, const std::filesystem::path& filePath)
+	{
+		SceneSerializer serializer(scene);
+		serializer.serialize(filePath.string());
+	}
+
 	void EditorLayer::newScene()
 	{
-		m_Scene = createRef<Scene>();
-		m_Scene->onViewportResize((unsigned int)m_ViewportSize.x, (unsigned int)m_ViewportSize.y);
-		m_SceneHierarchyPanel.setContext(m_Scene);
+		m_ActiveScene = createRef<Scene>();
+		m_ActiveScene->onViewportResize((unsigned int)m_ViewportSize.x, (unsigned int)m_ViewportSize.y);
+		m_SceneHierarchyPanel.setContext(m_ActiveScene);
+		m_EditorScenePath = std::filesystem::path();
 	}
 
 	void EditorLayer::openScene()
@@ -341,23 +356,43 @@ namespace GCE
 
 	void EditorLayer::openScene(const std::filesystem::path& filePath)
 	{
-		m_Scene = createRef<Scene>();
-		m_Scene->onViewportResize((unsigned int)m_ViewportSize.x, (unsigned int)m_ViewportSize.y);
-		m_SceneHierarchyPanel.setContext(m_Scene);
+		if (m_SceneState != SceneState::Edit)
+			onSceneStop();
 
-		SceneSerializer serializer(m_Scene);
+		if (filePath.extension().string() != ".gce")
+			return;
+
+		m_EditorScene = createRef<Scene>();
+		m_EditorScene->onViewportResize((unsigned int)m_ViewportSize.x, (unsigned int)m_ViewportSize.y);
+		m_SceneHierarchyPanel.setContext(m_EditorScene);
+
+		SceneSerializer serializer(m_EditorScene);
 		serializer.deserialize(filePath.string());
-		
+
+		m_ActiveScene = m_EditorScene;
+		m_EditorScenePath = filePath;
 	}
 
-	void EditorLayer::saveScene()
+	void EditorLayer::saveSceneAs()
 	{
 		std::string filePath = FileDialogs::saveFile("GCE Scene (*.gce)\0*.gce\0");
 		if (!filePath.empty())
 		{
-			SceneSerializer serializer(m_Scene);
+			SceneSerializer serializer(m_ActiveScene);
 			serializer.serialize(filePath);
+			m_EditorScenePath = filePath;
 		}
+	}
+
+	void EditorLayer::saveScene()
+	{
+		if (!m_EditorScenePath.empty())
+		{
+			SceneSerializer serializer(m_EditorScene);
+			serializer.serialize(m_EditorScenePath.string());
+		}
+		else
+			saveSceneAs();
 	}
 
 	void EditorLayer::drawStats()
@@ -431,7 +466,7 @@ namespace GCE
 			//Camera
 #if SceneCamera
 			//SceneCamera
-			auto cameraEntity = m_Scene->getPrimaryCamera();
+			auto cameraEntity = m_ActiveScene->getPrimaryCamera();
 			const auto& camera = cameraEntity.getComponent<CameraComponent>().camera;
 
 			//Matrices
@@ -476,13 +511,31 @@ namespace GCE
 	void EditorLayer::onScenePlay()
 	{
 		m_SceneState = SceneState::Play;
-		m_Scene->onRuntimeStart();
+
+		m_ActiveScene = Scene::copy(m_EditorScene);
+		m_SceneHierarchyPanel.setContext(m_ActiveScene);
+		m_ActiveScene->onRuntimeStart();
 	}
 
 	void EditorLayer::onSceneStop()
 	{
 		m_SceneState = SceneState::Edit;
-		m_Scene->onRuntimeStop();
+		m_ActiveScene->onRuntimeStop();
+
+		m_ActiveScene = m_EditorScene;
+		m_SceneHierarchyPanel.setContext(m_ActiveScene);
+		m_ActiveScene->onViewportResize((unsigned int)m_ViewportSize.x, (unsigned int)m_ViewportSize.y);
+	}
+
+	void EditorLayer::onDuplicateEntity()
+	{
+		if (m_SceneState != SceneState::Edit)
+			return;
+
+		Entity selectedEntity = m_SceneHierarchyPanel.getSelectedEntity();
+
+		if (selectedEntity)
+			m_EditorScene->duplicateEntity(selectedEntity);
 	}
 
 }

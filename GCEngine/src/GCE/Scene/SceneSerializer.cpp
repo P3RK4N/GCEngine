@@ -174,8 +174,10 @@ namespace GCE
 
 	static void serializeEntity(YAML::Emitter& out, Entity entity)
 	{
+		GCE_ASSERT(entity.hasComponent<IDComponent>(), "Unknown entity");
+
 		out << YAML::BeginMap; //Entity
-		out << YAML::Key << "Entity" << YAML::Value << "123412343212";
+		out << YAML::Key << "Entity" << YAML::Value << entity.getUUID();
 
 		serializeComponent<TagComponent>("TagComponent", out, entity, [](YAML::Emitter& out, const TagComponent& component)
 		{
@@ -184,9 +186,9 @@ namespace GCE
 
 		serializeComponent<TransformComponent>("TransformComponent", out, entity, [](YAML::Emitter& out, const TransformComponent& component)
 		{
-				out << YAML::Key << "Position" << YAML::Value << component.translation;
-				out << YAML::Key << "Rotation" << YAML::Value << component.rotation;
-				out << YAML::Key << "Scale" << YAML::Value << component.scale;
+			out << YAML::Key << "Position" << YAML::Value << component.translation;
+			out << YAML::Key << "Rotation" << YAML::Value << component.rotation;
+			out << YAML::Key << "Scale" << YAML::Value << component.scale;
 		});
 
 		serializeComponent<SpriteRendererComponent>("SpriteRendererComponent", out, entity, [](YAML::Emitter& out, const SpriteRendererComponent& component)
@@ -194,6 +196,13 @@ namespace GCE
 			out << YAML::Key << "Color" << YAML::Value << component.color;
 			out << YAML::Key << "Texture" << YAML::Value << (component.texture ? (std::reinterpret_pointer_cast<OpenGLTexture2D>(component.texture))->getPath() : "");
 			out << YAML::Key << "TextureScale" << YAML::Value << component.textureScale;
+		});
+
+		serializeComponent<CircleRendererComponent>("CircleRendererComponent", out, entity, [](YAML::Emitter& out, const CircleRendererComponent& component)
+		{
+			out << YAML::Key << "Color" << YAML::Value << component.color;
+			out << YAML::Key << "Thickness" << YAML::Value << component.thickness;
+			out << YAML::Key << "Fade" << YAML::Value << component.fade;
 		});
 
 		serializeComponent<CameraComponent>("CameraComponent", out, entity, [](YAML::Emitter& out, const CameraComponent& component)
@@ -268,13 +277,15 @@ namespace GCE
 			for(auto entity : entities)
 			{
 				std::string name;
+				uint64_t uuid = entity["Entity"].as<uint64_t>();
+
 				auto tagComponent = entity["TagComponent"];
 				if (tagComponent)
 					name = tagComponent["Tag"].as<std::string>();
 
 				GCE_CORE_TRACE("Deserializing entity '{0}'", name);
 
-				Entity deserializedEntity = m_Scene->createEntity(name);
+				Entity deserializedEntity = m_Scene->createEntityWithUUID(uuid, name);
 
 				auto transformComponent = entity["TransformComponent"];
 				if(transformComponent)
@@ -315,6 +326,15 @@ namespace GCE
 					auto texturePath = spriteRendererComponent["Texture"].as<std::string>();
 					if (!texturePath.empty())
 						src.texture = Texture2D::create(texturePath);
+				}
+
+				auto circleRendererComponent = entity["CircleRendererComponent"];
+				if (circleRendererComponent)
+				{
+					auto& crc = deserializedEntity.addComponent<CircleRendererComponent>();
+					crc.color = circleRendererComponent["Color"].as<glm::vec4>();
+					crc.thickness = circleRendererComponent["Thickness"].as<float>();
+					crc.fade= circleRendererComponent["Fade"].as<float>();
 				}
 
 				auto rigidbody2DComponent = entity["Rigidbody2DComponent"];

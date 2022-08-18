@@ -24,26 +24,67 @@ namespace GCE
 		int entityID;
 	};
 
+	struct CircleVertex
+	{
+		glm::vec3 worldPosition;
+		glm::vec3 localPosition;
+		glm::vec4 color;
+		float thickness;
+		float fade;
+
+		//Editor only
+		int entityID;
+	};
+
+	struct LineVertex
+	{
+		glm::vec3 position;
+		glm::vec4 color;
+
+		//Editor only
+		int entityID;
+	};
+
 	struct Renderer2DData
 	{
 		static const unsigned int maxQuads = 10000;
 		static const unsigned int maxVertices = maxQuads * 4;
 		static const unsigned int maxIndices = maxQuads * 6;
 		static const unsigned int maxTextureSlots = 32; //RenderCaps TODO
+		glm::vec4 quadVertexPositions[4];
 
 		Ref<VertexArray> quadVertexArray;
 		Ref<VertexBuffer> quadVertexBuffer;
-		Ref<Shader> textureShader;
-		Ref<Texture2D> whiteTex;
+		Ref<Shader> quadShader;
 
 		unsigned int quadIndexCount = 0;
 		QuadVertex* quadVertexBufferBase = nullptr;
 		QuadVertex* quadVertexBufferPtr = nullptr;
 
-		std::array<Ref<Texture2D>, maxTextureSlots> textureSlots;
-		unsigned int textureSlotIndex = 1;
 
-		glm::vec4 quadVertexPositions[4];
+		Ref<VertexArray> circleVertexArray;
+		Ref<VertexBuffer> circleVertexBuffer;
+		Ref<Shader> circleShader;
+
+		unsigned int circleIndexCount = 0;
+		CircleVertex* circleVertexBufferBase = nullptr;
+		CircleVertex* circleVertexBufferPtr = nullptr;
+
+
+		Ref<VertexArray> lineVertexArray;
+		Ref<VertexBuffer> lineVertexBuffer;
+		Ref<Shader> lineShader;
+
+		unsigned int lineVertexCount = 0;
+		LineVertex* lineVertexBufferBase = nullptr;
+		LineVertex* lineVertexBufferPtr = nullptr;
+
+		float lineWidth = 2.0f;
+
+
+		std::array<Ref<Texture2D>, maxTextureSlots> textureSlots;
+		Ref<Texture2D> whiteTex;
+		unsigned int textureSlotIndex = 1;
 
 		Renderer2D::Statistics stats;
 
@@ -62,43 +103,78 @@ namespace GCE
 	{
 		GCE_PROFILE_FUNCTION();
 
+		unsigned int* indices = new unsigned int[s_Data.maxIndices];
+
+		unsigned int offset = 0;	
+		for (unsigned int i = 0; i < s_Data.maxIndices; i += 6)
+		{
+			indices[i + 0] = offset + 0;
+			indices[i + 1] = offset + 1;
+			indices[i + 2] = offset + 2;
+			indices[i + 3] = offset + 2;
+			indices[i + 4] = offset + 3;
+			indices[i + 5] = offset + 0;
+
+			offset += 4;
+		}
+
+		//----------------------------------------------------------------------------------------------------
 		s_Data.quadVertexArray = VertexArray::create();
 
 		//VBO
 		s_Data.quadVertexBuffer = VertexBuffer::create(s_Data.maxVertices * sizeof(QuadVertex));
 		s_Data.quadVertexBuffer->setLayout
 		({ 
-			{ ShaderDataType::Float3, "a_position" }, 
+			{ ShaderDataType::Float3, "a_Position" }, 
 			{ ShaderDataType::Float4, "a_Color" }, 
 			{ ShaderDataType::Float2, "a_UV" },
-			{ ShaderDataType::Float, "a_TextureIndex" },
-			{ ShaderDataType::Float, "a_TextureScale" },
-			{ ShaderDataType::Int, "a_EntityID" }
+			{ ShaderDataType::Float,  "a_TexIndex" },
+			{ ShaderDataType::Float,  "a_TextureScale" },
+			{ ShaderDataType::Int,	  "a_EntityID" }
 		});
 
 		s_Data.quadVertexArray->addVertexBuffer(s_Data.quadVertexBuffer);
 
 		s_Data.quadVertexBufferBase = new QuadVertex[s_Data.maxVertices];
 
-		unsigned int* quadIndices = new unsigned int[s_Data.maxIndices];
-
-		unsigned int offset = 0;	
-		for (unsigned int i = 0; i < s_Data.maxIndices; i += 6)
-		{
-			quadIndices[i + 0] = offset + 0;
-			quadIndices[i + 1] = offset + 1;
-			quadIndices[i + 2] = offset + 2;
-			quadIndices[i + 3] = offset + 2;
-			quadIndices[i + 4] = offset + 3;
-			quadIndices[i + 5] = offset + 0;
-
-			offset += 4;
-		}
 		//EBO
-		Ref<IndexBuffer> quadIB = IndexBuffer::create(quadIndices, s_Data.maxIndices);
+		Ref<IndexBuffer> quadIB = IndexBuffer::create(indices, s_Data.maxIndices);
 		s_Data.quadVertexArray->setIndexBuffer(quadIB);
-		//----------
-		delete[] quadIndices;
+		//-------------------------------------------------------------------------------------------------------
+
+		s_Data.circleVertexArray = VertexArray::create();
+
+		//VBO
+		s_Data.circleVertexBuffer = VertexBuffer::create(s_Data.maxVertices * sizeof(CircleVertex));
+		s_Data.circleVertexBuffer->setLayout
+		({ 
+			{ ShaderDataType::Float3,	"a_WorldPosition" }, 
+			{ ShaderDataType::Float3,	"a_LocalPosition" }, 
+			{ ShaderDataType::Float4,	"a_Color" }, 
+			{ ShaderDataType::Float,	"a_Thickness" },
+			{ ShaderDataType::Float,	"a_Fade" },
+			{ ShaderDataType::Int,		"a_EntityID" }
+		});
+
+		s_Data.circleVertexArray->addVertexBuffer(s_Data.circleVertexBuffer);
+		s_Data.circleVertexArray->setIndexBuffer(quadIB);
+		s_Data.circleVertexBufferBase = new CircleVertex[s_Data.maxVertices];
+		//-------------------------------------------------------------------------------------------
+
+		s_Data.lineVertexArray = VertexArray::create();
+		//VBO
+		s_Data.lineVertexBuffer = VertexBuffer::create(s_Data.maxVertices * sizeof(LineVertex));
+		s_Data.lineVertexBuffer->setLayout
+		({ 
+			{ ShaderDataType::Float3,	"a_Position" }, 
+			{ ShaderDataType::Float4,	"a_Color" },
+			{ ShaderDataType::Int,		"a_EntityID" }
+		});
+
+		s_Data.lineVertexArray->addVertexBuffer(s_Data.lineVertexBuffer);
+		s_Data.lineVertexBufferBase = new LineVertex[s_Data.maxVertices];
+		//-------------------------------------------------------------------------------------------
+		delete[] indices;
 
 		//Texture
 		s_Data.whiteTex = Texture2D::create(1, 1);
@@ -111,10 +187,9 @@ namespace GCE
 			samplers[i] = i;
 
 		//Shader
-		s_Data.textureShader = Shader::create("assets/shaders/texture.glsl");
-		//s_Data.textureShader->bind();
-		//s_Data.textureShader->setIntArray("u_Textures", samplers, s_Data.maxTextureSlots);
-
+		s_Data.quadShader = Shader::create("assets/shaders/Renderer2D_Quad.glsl");
+		s_Data.circleShader = Shader::create("assets/shaders/Renderer2D_Circle.glsl");
+		s_Data.lineShader = Shader::create("assets/shaders/Renderer2D_Line.glsl");
 
 		s_Data.textureSlots[0] = s_Data.whiteTex;
 
@@ -131,18 +206,17 @@ namespace GCE
 		GCE_PROFILE_FUNCTION();
 
 		delete[] s_Data.quadVertexBufferBase;
+		delete[] s_Data.circleVertexBufferBase;
 	}
 
 	void Renderer2D::beginScene(const OrthographicCamera& orthographicCamera)
 	{
 		GCE_PROFILE_FUNCTION();
 
-		s_Data.textureShader->bind();
-		s_Data.textureShader->setMat4("u_ViewProjectionMatrix", orthographicCamera.getViewProjectionMatrix());
+		s_Data.quadShader->bind();
+		s_Data.quadShader->setMat4("u_ViewProjectionMatrix", orthographicCamera.getViewProjectionMatrix());
 
-		s_Data.quadIndexCount = 0;
-		s_Data.textureSlotIndex = 1;
-		s_Data.quadVertexBufferPtr = s_Data.quadVertexBufferBase;
+		startBatch();
 	}
 
 	void Renderer2D::beginScene(const Camera& camera, glm::mat4& transform)
@@ -168,33 +242,61 @@ namespace GCE
 	void Renderer2D::startBatch()
 	{
 		s_Data.quadIndexCount = 0;
-		s_Data.textureSlotIndex = 1;
 		s_Data.quadVertexBufferPtr = s_Data.quadVertexBufferBase;
+
+		s_Data.circleIndexCount = 0;
+		s_Data.circleVertexBufferPtr = s_Data.circleVertexBufferBase;
+
+		s_Data.lineVertexCount = 0;
+		s_Data.lineVertexBufferPtr = s_Data.lineVertexBufferBase;
+
+		s_Data.textureSlotIndex = 1;
 	}
 
 	void Renderer2D::endScene()
 	{
 		GCE_PROFILE_FUNCTION();
 
-		unsigned int dataSize = (unsigned int)((uint8_t*)s_Data.quadVertexBufferPtr - (uint8_t*)s_Data.quadVertexBufferBase);
-		s_Data.quadVertexBuffer->setData(s_Data.quadVertexBufferBase, dataSize);
-
 		flush();
 	}
 
 	void Renderer2D::flush()
 	{
-		if(!s_Data.quadIndexCount)
-			return;
-
-		for (unsigned int i = 0; i < s_Data.textureSlotIndex; i++)
+		if (s_Data.quadIndexCount)
 		{
-			s_Data.textureSlots[i]->bind(i);
+			unsigned int dataSize = (unsigned int)((uint8_t*)s_Data.quadVertexBufferPtr - (uint8_t*)s_Data.quadVertexBufferBase);
+			s_Data.quadVertexBuffer->setData(s_Data.quadVertexBufferBase, dataSize);
+
+			for (unsigned int i = 0; i < s_Data.textureSlotIndex; i++)
+			{
+				s_Data.textureSlots[i]->bind(i);
+			}
+
+			s_Data.quadShader->bind();
+			RenderCommand::drawIndexed(s_Data.quadVertexArray, s_Data.quadIndexCount);
+			s_Data.stats.drawCalls++;	
 		}
 
-		s_Data.textureShader->bind();
-		RenderCommand::drawIndexed(s_Data.quadVertexArray, s_Data.quadIndexCount);
-		s_Data.stats.drawCalls++;
+		if (s_Data.circleIndexCount)
+		{
+			unsigned int dataSize = (unsigned int)((uint8_t*)s_Data.circleVertexBufferPtr - (uint8_t*)s_Data.circleVertexBufferBase);
+			s_Data.circleVertexBuffer->setData(s_Data.circleVertexBufferBase, dataSize);
+
+			s_Data.circleShader->bind();
+			RenderCommand::drawIndexed(s_Data.circleVertexArray, s_Data.circleIndexCount);
+			s_Data.stats.drawCalls++;	
+		}
+
+		if (s_Data.lineVertexCount > 1)
+		{
+			unsigned int dataSize = (unsigned int)((uint8_t*)s_Data.lineVertexBufferPtr - (uint8_t*)s_Data.lineVertexBufferBase);
+			s_Data.lineVertexBuffer->setData(s_Data.lineVertexBufferBase, dataSize);
+
+			s_Data.lineShader->bind();
+			RenderCommand::setLineWidth(s_Data.lineWidth);
+			RenderCommand::drawLines(s_Data.lineVertexArray, s_Data.lineVertexCount);
+			s_Data.stats.drawCalls++;	
+		}
 	}
 
 	void Renderer2D::drawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
@@ -547,12 +649,85 @@ namespace GCE
 		s_Data.stats.quadCount++;
 	}
 
+	void Renderer2D::drawRect(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, int entityID)
+	{
+		glm::vec3 p0 = glm::vec3(position.x - size.x * 0.5f, position.y - size.y * 0.5f, position.z);
+		glm::vec3 p1 = glm::vec3(position.x + size.x * 0.5f, position.y - size.y * 0.5f, position.z);
+		glm::vec3 p2 = glm::vec3(position.x + size.x * 0.5f, position.y + size.y * 0.5f, position.z);
+		glm::vec3 p3 = glm::vec3(position.x - size.x * 0.5f, position.y + size.y * 0.5f, position.z);
+
+		drawLine(p0, p1, color, entityID);
+		drawLine(p1, p2, color, entityID);
+		drawLine(p2, p3, color, entityID);
+		drawLine(p3, p0, color, entityID);
+	}
+
+	void Renderer2D::drawRect(const glm::mat4& transform, const glm::vec4& color, int entityID)
+	{
+		glm::vec4 lineVertices[4];
+
+		for(size_t i = 0; i < 4; i++)
+			lineVertices[0] = transform * s_Data.quadVertexPositions[i];
+
+		for(int i = 0; i < 4; i++)
+			drawLine(lineVertices[i], lineVertices[(i+1)%4], color, entityID);
+	}
+
 	void Renderer2D::drawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID)
 	{
 		if (src.texture)
 			drawQuad(transform, src.texture, src.textureScale, src.color, entityID);
 		else
 			drawQuad(transform, src.color, entityID);
+	}
+
+	void Renderer2D::drawCircle(const glm::mat4 transform, const glm::vec4& color, float thickness, float fade, int entityID)
+	{
+		GCE_PROFILE_FUNCTION();
+
+		for (size_t i = 0; i < 4; i++)
+		{
+			s_Data.circleVertexBufferPtr->worldPosition = transform * s_Data.quadVertexPositions[i];
+			s_Data.circleVertexBufferPtr->localPosition = s_Data.quadVertexPositions[i] * 2.0f;
+			s_Data.circleVertexBufferPtr->color = color;
+			s_Data.circleVertexBufferPtr->fade = fade;
+			s_Data.circleVertexBufferPtr->thickness = thickness;
+			s_Data.circleVertexBufferPtr->entityID = entityID;
+			s_Data.circleVertexBufferPtr++;
+		}
+
+		s_Data.circleIndexCount += 6;
+
+		s_Data.stats.quadCount++;
+	}
+
+	void Renderer2D::drawLine(const glm::vec3& x, const glm::vec3& y, const glm::vec4& color, int entityID)
+	{
+		GCE_PROFILE_FUNCTION();
+
+		s_Data.lineVertexBufferPtr->position = x;
+		s_Data.lineVertexBufferPtr->color = color;
+		s_Data.lineVertexBufferPtr->entityID = entityID;
+
+		s_Data.lineVertexBufferPtr++;
+
+		s_Data.lineVertexBufferPtr->position = y;
+		s_Data.lineVertexBufferPtr->color = color;
+		s_Data.lineVertexBufferPtr->entityID = entityID;
+
+		s_Data.lineVertexBufferPtr++;
+
+		s_Data.lineVertexCount += 2;
+	}
+
+	float Renderer2D::getLineWidth()
+	{
+		return s_Data.lineWidth;
+	}
+
+	void Renderer2D::setLineWidth(float lineWidth)
+	{
+		s_Data.lineWidth = lineWidth;	
 	}
 
 	Renderer2D::Statistics Renderer2D::getStats()

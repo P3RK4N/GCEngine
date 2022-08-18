@@ -31,10 +31,15 @@ namespace GCE
 		void newScene();
 		void openScene();
 		void openScene(const std::filesystem::path& path);
+		void saveSceneAs();
 		void saveScene();
+
+		void serializeScene(const Ref<Scene>& scene, const std::filesystem::path& filePath);
 
 		void onScenePlay();
 		void onSceneStop();
+
+		void onDuplicateEntity();
 
 		//UI
 		void UI_Toolbar();
@@ -48,7 +53,9 @@ namespace GCE
 		bool m_ViewportFocused = false;
 		bool m_ViewportHovered = false;
 
-		Ref<Scene> m_Scene;
+		Ref<Scene> m_ActiveScene;
+		Ref<Scene> m_EditorScene;
+		std::filesystem::path m_EditorScenePath;
 
 		Entity m_HoveredEntity;
 

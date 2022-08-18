@@ -1,8 +1,8 @@
 #pragma once
 
 #include "GCE/Scene/SceneCamera.h"
-#include "GCE/Scene/ScriptableEntity.h"
 #include "GCE/Renderer/Texture.h"
+#include "GCE/Core/UUID.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/glm.hpp>
@@ -12,6 +12,15 @@
 
 namespace GCE
 {
+	struct IDComponent
+	{
+		UUID id;
+
+		IDComponent() = default;
+		IDComponent(const IDComponent&) = default;
+		IDComponent(const UUID& uuid) : id(uuid) {}
+	};
+
 	struct TagComponent
 	{
 		std::string tag;
@@ -54,6 +63,18 @@ namespace GCE
 		SpriteRendererComponent(const glm::vec4& color) : color(color) {}
 	};
 
+	struct CircleRendererComponent
+	{
+		glm::vec4 color{ 1.0f, 1.0f, 1.0f, 1.0f };
+		float thickness = 1.0f;
+		float fade = 0.005f;
+
+		CircleRendererComponent() = default;
+		CircleRendererComponent(const CircleRendererComponent&) = default;
+		CircleRendererComponent(const glm::vec4& color, float thickness = 1.0f, float fade = 0.005f)
+			: color(color), thickness(thickness), fade(fade) {}
+	};
+
 	struct CameraComponent
 	{
 		SceneCamera camera;
@@ -63,6 +84,8 @@ namespace GCE
 		CameraComponent() = default;
 		CameraComponent(const CameraComponent&) = default;
 	};
+
+	class ScriptableEntity;
 
 	struct NativeScriptComponent
 	{
@@ -77,6 +100,9 @@ namespace GCE
 			instantiateScript	=	[]	()								{ return static_cast<ScriptableEntity*>(new T());	};
 			destroyScript		=	[]	(NativeScriptComponent* nsc)	{ delete nsc->instance; nsc->instance = nullptr;	};
 		}
+
+		NativeScriptComponent() = default;
+		NativeScriptComponent(const NativeScriptComponent&) = default;
 	};
 
 	//Physics

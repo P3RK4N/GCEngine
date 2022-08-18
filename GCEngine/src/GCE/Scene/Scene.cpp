@@ -38,10 +38,68 @@ namespace GCE
 
 	}
 
+	template<typename Component>
+	static void copyComponent(entt::registry& src, entt::registry& dst, std::unordered_map<uint64_t, entt::entity>& enttMap)
+	{
+		auto view = src.view<Component>();
+		for (auto e : view)
+		{
+			UUID uuid = src.get<IDComponent>(e).id;
+			entt::entity enttID = enttMap.at(uuid);
+
+			auto& component = src.get<Component>(e);
+			dst.emplace_or_replace<Component>(enttID, component);
+		}
+	}
+
+	template<typename Component>
+	static void copyComponentIfExists(Entity src, Entity dst)
+	{
+		if (src.hasComponent<Component>())
+			dst.addOrReplaceComponent<Component>(src.getComponent<Component>());
+	}
+
+	Ref<Scene> Scene::copy(Ref<Scene> otherScene)
+	{
+		Ref<Scene> newScene = createRef<Scene>();
+		newScene->m_ViewportWidth = otherScene->m_ViewportWidth;
+		newScene->m_ViewportHeight = otherScene->m_ViewportHeight;
+
+		std::unordered_map<uint64_t, entt::entity> enttMap;
+
+		auto& srcSceneRegistry = otherScene->m_Registry;
+		auto& dstSceneRegistry = newScene->m_Registry;
+
+		auto idView = srcSceneRegistry.view<IDComponent>();
+		for (auto e : idView)
+		{
+			UUID uuid = srcSceneRegistry.get<IDComponent>(e).id;
+			const auto& name = srcSceneRegistry.get<TagComponent>(e).tag;
+			Entity newEntity = newScene->createEntityWithUUID(uuid, name);
+			enttMap[uuid] = newEntity;
+		}
+
+		copyComponent<TransformComponent>(srcSceneRegistry, dstSceneRegistry, enttMap);
+		copyComponent<SpriteRendererComponent>(srcSceneRegistry, dstSceneRegistry, enttMap);
+		copyComponent<CircleRendererComponent>(srcSceneRegistry, dstSceneRegistry, enttMap);
+		copyComponent<CameraComponent>(srcSceneRegistry, dstSceneRegistry, enttMap);
+		copyComponent<NativeScriptComponent>(srcSceneRegistry, dstSceneRegistry, enttMap);
+		copyComponent<Rigidbody2DComponent>(srcSceneRegistry, dstSceneRegistry, enttMap);
+		copyComponent<BoxCollider2DComponent>(srcSceneRegistry, dstSceneRegistry, enttMap);
+
+		return newScene;
+	}
+
 	Entity Scene::createEntity(const std::string& name)
+	{
+		return createEntityWithUUID(UUID(), name);
+	}
+
+	Entity Scene::createEntityWithUUID(UUID uuid, const std::string& name)
 	{
 		Entity entity = { m_Registry.create(), this };
 
+		entity.addComponent<IDComponent>(uuid);
 		entity.addComponent<TransformComponent>();
 		entity.addComponent<TagComponent>(name.empty() ? "Entity" : name);
 
@@ -57,13 +115,25 @@ namespace GCE
 	{
 		Renderer2D::beginScene(camera);
 
-		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-		for (auto entity : group)
 		{
-			auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-			//Renderer2D::drawQuad(transform.getTransform(), sprite.color);
-			Renderer2D::drawSprite(transform.getTransform(), sprite, (int)entity);
+			auto spriteView = m_Registry.view<TransformComponent, SpriteRendererComponent>();
+			for (auto entity : spriteView)
+			{
+				auto [transform, sprite] = spriteView.get<TransformComponent, SpriteRendererComponent>(entity);
+				Renderer2D::drawSprite(transform.getTransform(), sprite, (int)entity);
+			}
 		}
+
+		{
+			auto circleView = m_Registry.view<TransformComponent, CircleRendererComponent>();
+			for (auto entity : circleView)
+			{
+				auto [transform, circle] = circleView.get<TransformComponent, CircleRendererComponent>(entity);
+				Renderer2D::drawCircle(transform.getTransform(), circle.color, circle.thickness, circle.fade, (uint32_t)entity);
+			}
+		}
+
+		Renderer2D::drawRect(glm::vec3(0.0f), glm::vec2(5.0f), glm::vec4(1.0f));
 
 		Renderer2D::endScene();
 	}
@@ -119,12 +189,22 @@ namespace GCE
 
 				Renderer2D::beginScene(*mainCamera, cameraTransform);
 
-				auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-				for (auto entity : group)
 				{
-					auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-					//Renderer2D::drawQuad(transform.getTransform(), sprite.color);
-					Renderer2D::drawSprite(transform.getTransform(), sprite, (uint32_t)entity);
+					auto spriteView = m_Registry.view<TransformComponent, SpriteRendererComponent>();
+					for (auto entity : spriteView)
+					{
+						auto [transform, sprite] = spriteView.get<TransformComponent, SpriteRendererComponent>(entity);
+						Renderer2D::drawSprite(transform.getTransform(), sprite, (int)entity);
+					}
+				}
+
+				{
+					auto circleView = m_Registry.view<TransformComponent, CircleRendererComponent>();
+					for (auto entity : circleView)
+					{
+						auto [transform, circle] = circleView.get<TransformComponent, CircleRendererComponent>(entity);
+						Renderer2D::drawCircle(transform.getTransform(), circle.color, circle.thickness, circle.fade, (uint32_t)entity);
+					}
 				}
 
 				Renderer2D::endScene();
@@ -152,6 +232,20 @@ namespace GCE
 	{
 		if (!cameraComponent.fixedAspectRatio)
 				cameraComponent.camera.setViewportSize(m_ViewportWidth, m_ViewportHeight);
+	}
+
+	void Scene::duplicateEntity(Entity entity)
+	{
+		std::string name = entity.getName();
+		Entity newEntity = createEntity(name);
+
+		copyComponentIfExists<TransformComponent>(entity, newEntity);
+		copyComponentIfExists<SpriteRendererComponent>(entity, newEntity);
+		copyComponentIfExists<CircleRendererComponent>(entity, newEntity);
+		copyComponentIfExists<CameraComponent>(entity, newEntity);
+		copyComponentIfExists<NativeScriptComponent>(entity, newEntity);
+		copyComponentIfExists<Rigidbody2DComponent>(entity, newEntity);
+		copyComponentIfExists<BoxCollider2DComponent>(entity, newEntity);
 	}
 
 	Entity Scene::getPrimaryCamera()
@@ -239,7 +333,19 @@ namespace GCE
 	}
 
 	template<>
+	void Scene::onComponentAdded<CircleRendererComponent>(Entity entity, CircleRendererComponent& component)
+	{
+
+	}
+
+	template<>
 	void Scene::onComponentAdded<TagComponent>(Entity entity, TagComponent& component)
+	{
+
+	}
+
+	template<>
+	void Scene::onComponentAdded<IDComponent>(Entity entity, IDComponent& component)
 	{
 
 	}
