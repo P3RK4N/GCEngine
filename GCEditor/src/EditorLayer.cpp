@@ -141,7 +141,59 @@ namespace GCE
 			m_HoveredEntity = pixelData == -1 ? Entity{} : Entity{ (entt::entity)pixelData, m_ActiveScene.get() };
 		}
 
+		onOverlayRender();
+
 		m_FrameBuffer->unbind();
+	}
+
+	void EditorLayer::onOverlayRender()
+	{
+
+		if (m_SceneState == SceneState::Play)
+		{
+			Entity camera = m_ActiveScene->getPrimaryCamera();
+			
+			Renderer2D::beginScene(camera.getComponent<CameraComponent>().camera, camera.getComponent<TransformComponent>().getTransform());
+		}
+		else
+		{
+			Renderer2D::beginScene(m_EditorCamera);
+		}
+
+		if (m_ShowPhysicsColliders)
+		{
+			{
+				auto view = m_ActiveScene->getAllEntitiesWith<TransformComponent, CircleCollider2DComponent>();
+				for (auto entity : view)
+				{
+					auto [tc , cc2dc] = view.get<TransformComponent, CircleCollider2DComponent>(entity);
+
+					glm::vec3 translation = tc.translation + glm::vec3(cc2dc.offset, 0.01f);
+					glm::vec3 scale = tc.scale * glm::vec3(cc2dc.radius * 2.0f);
+
+					glm::mat4 transform = glm::scale(glm::translate(glm::mat4(1.0f), translation), scale);
+
+					Renderer2D::drawCircle(transform, glm::vec4(0,1,1,1), 0.05f);
+				}
+			}
+
+			{
+				auto view = m_ActiveScene->getAllEntitiesWith<TransformComponent, BoxCollider2DComponent>();
+				for (auto entity : view)
+				{
+					auto [tc , bc2dc] = view.get<TransformComponent, BoxCollider2DComponent>(entity);
+
+					glm::vec3 translation = tc.translation + glm::vec3(bc2dc.offset, 0.01f);
+					glm::vec3 scale = tc.scale * glm::vec3(bc2dc.size * 2.0f, 1.0f);
+
+					glm::mat4 transform = glm::scale(glm::rotate(glm::translate(glm::mat4(1.0f), translation), tc.rotation.z, {0,0,1}), scale); 
+
+					Renderer2D::drawRect(transform, glm::vec4(0,1,1,1));
+				}
+			}
+		}
+
+		Renderer2D::endScene();
 	}
 
 	void EditorLayer::onImGuiRender()
@@ -399,6 +451,7 @@ namespace GCE
 	{
 		ImGui::Begin("Statistics");
 
+		ImGui::Checkbox("Show Physics Collides", &m_ShowPhysicsColliders);
 		std::string hoveredEntity = !m_HoveredEntity ? "None" : m_HoveredEntity.getComponent<TagComponent>().tag;
 		ImGui::Text("Hovered Entity: %s", hoveredEntity.c_str());
 

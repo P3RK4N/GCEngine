@@ -36,6 +36,12 @@ namespace GCE
 
 		Entity getPrimaryCamera();
 
+		template<typename... Components>
+		auto getAllEntitiesWith()
+		{
+			return m_Registry.view<Components...>();
+		}
+
 	private:
 		void resetCameraComponent(CameraComponent& cameraComponent);
 

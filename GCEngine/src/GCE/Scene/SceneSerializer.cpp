@@ -228,6 +228,16 @@ namespace GCE
 			out << YAML::Key << "RestitutionThreshold" << YAML::Value << component.restitutionThreshold;
 		});
 
+		serializeComponent<CircleCollider2DComponent>("CircleCollider2DComponent", out, entity, [](YAML::Emitter& out, const CircleCollider2DComponent& component)
+		{
+			out << YAML::Key << "Offset" << YAML::Value << component.offset;
+			out << YAML::Key << "Radius" << YAML::Value << component.radius;
+			out << YAML::Key << "Density" << YAML::Value << component.density;
+			out << YAML::Key << "Friction" << YAML::Value << component.friction;
+			out << YAML::Key << "Restitution" << YAML::Value << component.restitution;
+			out << YAML::Key << "RestitutionThreshold" << YAML::Value << component.restitutionThreshold;
+		});
+
 		out << YAML::EndMap; //Entity
 	}
 
@@ -355,6 +365,18 @@ namespace GCE
 					bc2dc.friction = boxCollider2DComponent["Friction"].as<float>();
 					bc2dc.restitution = boxCollider2DComponent["Restitution"].as<float>();
 					bc2dc.restitutionThreshold = boxCollider2DComponent["RestitutionThreshold"].as<float>();
+				}
+
+				auto circleCollider2DComponent = entity["CircleCollider2DComponent"];
+				if (circleCollider2DComponent)
+				{
+					auto& cc2dc = deserializedEntity.addComponent<CircleCollider2DComponent>();
+					cc2dc.offset = circleCollider2DComponent["Offset"].as<glm::vec2>();
+					cc2dc.radius = circleCollider2DComponent["Radius"].as<float>();
+					cc2dc.density = circleCollider2DComponent["Density"].as<float>();
+					cc2dc.friction = circleCollider2DComponent["Friction"].as<float>();
+					cc2dc.restitution = circleCollider2DComponent["Restitution"].as<float>();
+					cc2dc.restitutionThreshold = circleCollider2DComponent["RestitutionThreshold"].as<float>();
 				}
 			}
 		}

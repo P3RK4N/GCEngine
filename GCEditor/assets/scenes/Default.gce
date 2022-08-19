@@ -4,13 +4,23 @@ Entities:
     TagComponent:
       Tag: Empty Entity
     TransformComponent:
-      Position: [2.03463054, 12.8949347, 1.79398012]
+      Position: [2.54872942, 16.9013672, 1.90734863e-06]
       Rotation: [0, 0, 0]
       Scale: [5, 5, 1]
     CircleRendererComponent:
       Color: [0.779922783, 0.41577825, 0.129485279, 1]
       Thickness: 0.275000006
       Fade: 0.00899999961
+    Rigidbody2DComponent:
+      BodyType: Dynamic
+      FixedRotation: false
+    CircleCollider2DComponent:
+      Offset: [0, 0]
+      Radius: 0.5
+      Density: 1
+      Friction: 0.5
+      Restitution: 0.5
+      RestitutionThreshold: 0.5
   - Entity: 121234543212314567
     TagComponent:
       Tag: Quad

@@ -19,7 +19,7 @@ namespace GCE
 		static void init();
 		static void shutdown();
 
-		static void beginScene(const Camera& camera, glm::mat4& transform);
+		static void beginScene(const Camera& camera, const glm::mat4& transform);
 		static void beginScene(const EditorCamera& camera);
 		static void beginScene(const OrthographicCamera& orthographicCamera);
 

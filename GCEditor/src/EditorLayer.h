@@ -28,6 +28,8 @@ namespace GCE
 		bool onKeyPressed(KeyPressedEvent& e);
 		bool onMouseButtonPressed(MouseButtonPressedEvent& e);
 
+		void onOverlayRender();
+
 		void newScene();
 		void openScene();
 		void openScene(const std::filesystem::path& path);
@@ -60,6 +62,7 @@ namespace GCE
 		Entity m_HoveredEntity;
 
 		int m_GizmoType = -1;
+		bool m_ShowPhysicsColliders = true;
 
 		EditorCamera m_EditorCamera;
 

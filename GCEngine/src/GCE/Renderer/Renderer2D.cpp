@@ -219,7 +219,7 @@ namespace GCE
 		startBatch();
 	}
 
-	void Renderer2D::beginScene(const Camera& camera, glm::mat4& transform)
+	void Renderer2D::beginScene(const Camera& camera, const glm::mat4& transform)
 	{
 		GCE_PROFILE_FUNCTION();
 
@@ -664,13 +664,13 @@ namespace GCE
 
 	void Renderer2D::drawRect(const glm::mat4& transform, const glm::vec4& color, int entityID)
 	{
-		glm::vec4 lineVertices[4];
+		glm::vec3 linePositions[4];
 
 		for(size_t i = 0; i < 4; i++)
-			lineVertices[0] = transform * s_Data.quadVertexPositions[i];
+			linePositions[i] = transform * s_Data.quadVertexPositions[i];
 
 		for(int i = 0; i < 4; i++)
-			drawLine(lineVertices[i], lineVertices[(i+1)%4], color, entityID);
+			drawLine(linePositions[i], linePositions[(i+1)%4], color, entityID);
 	}
 
 	void Renderer2D::drawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID)
