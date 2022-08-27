@@ -42,7 +42,8 @@ project "GCEngine"
       "%{IncludeDir.yaml_cpp}",
       "%{IncludeDir.ImGuizmo}",
 		"%{IncludeDir.VulkanSDK}",
-      "%{IncludeDir.Box2D}"
+      "%{IncludeDir.Box2D}",
+      "%{IncludeDir.mono}"
    }
 
    links
@@ -52,7 +53,9 @@ project "GCEngine"
       "ImGui",
       "yaml-cpp",
       "opengl32.lib",
-      "Box2D"
+      "Box2D",
+
+      "%{Library.mono}"
    }
 
    filter "files:vendor/ImGuizmo/**.cpp"
@@ -65,6 +68,14 @@ project "GCEngine"
       {
          "GLFW_INCLUDE_NONE"
       }
+      links
+		{
+			"%{Library.WinSock}",
+			"%{Library.WinMM}",
+			"%{Library.WinVersion}",
+			"%{Library.BCrypt}",
+		}
+
 
    filter "configurations:Debug"
       defines "GCE_DEBUG"

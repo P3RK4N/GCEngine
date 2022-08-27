@@ -3,6 +3,7 @@
 
 #include "GCE/Events/ApplicationEvent.h"
 #include "GCE/Renderer/Renderer.h"
+#include "GCE/Scripting/ScriptEngine.h"
 #include "GCE/Core/Input.h"
 
 #include <GLFW/glfw3.h>
@@ -14,8 +15,8 @@ namespace GCE
 
 	Application* Application::s_Instance = nullptr;
 
-	Application::Application(const std::string& name, ApplicationCommandLineArgs args)
-		: m_CommandLineArgs(args)
+	Application::Application(const ApplicationSpecification& specification)
+		: m_Specification(specification)
 	{
 		GCE_PROFILE_FUNCTION();
 
@@ -23,10 +24,14 @@ namespace GCE
 
 		s_Instance = this;
 
-		m_Window = Window::Create(WindowProps(name));
+		if (!m_Specification.workingDirectory.empty())
+			std::filesystem::current_path(m_Specification.workingDirectory);
+
+		m_Window = Window::Create(WindowProps(specification.name));
 		m_Window->setEventCallback(BIND_EVENT_FN(Application::onEvent));
 
 		Renderer::init();
+		ScriptEngine::init();
 
 		m_ImGuiLayer = new ImGuiLayer();
 		this->pushOverlay(m_ImGuiLayer);
@@ -36,6 +41,8 @@ namespace GCE
 	{
 		GCE_PROFILE_FUNCTION();
 
+		ScriptEngine::shutdown();
+		Renderer::shutdown();
 	}
 
 	void Application::pushLayer(Layer* layer)

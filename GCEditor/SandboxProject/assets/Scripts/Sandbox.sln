@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox", "Sandbox.csproj", "{F4C124E3-60A1-A37E-69B9-2E55D5170AE0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GCE", "GCE", "{DB74F67E-47DF-AAF5-901D-5C9BFCC6884A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GCEngine-ScriptCore", "..\..\..\..\GCEngine-ScriptCore\GCEngine-ScriptCore.csproj", "{50EBD56F-BC4C-B37D-45BA-F92FB11AEA3C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Dist|x64 = Dist|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F4C124E3-60A1-A37E-69B9-2E55D5170AE0}.Debug|x64.ActiveCfg = Debug|x64
+		{F4C124E3-60A1-A37E-69B9-2E55D5170AE0}.Debug|x64.Build.0 = Debug|x64
+		{F4C124E3-60A1-A37E-69B9-2E55D5170AE0}.Dist|x64.ActiveCfg = Dist|x64
+		{F4C124E3-60A1-A37E-69B9-2E55D5170AE0}.Dist|x64.Build.0 = Dist|x64
+		{F4C124E3-60A1-A37E-69B9-2E55D5170AE0}.Release|x64.ActiveCfg = Release|x64
+		{F4C124E3-60A1-A37E-69B9-2E55D5170AE0}.Release|x64.Build.0 = Release|x64
+		{50EBD56F-BC4C-B37D-45BA-F92FB11AEA3C}.Debug|x64.ActiveCfg = Debug|x64
+		{50EBD56F-BC4C-B37D-45BA-F92FB11AEA3C}.Debug|x64.Build.0 = Debug|x64
+		{50EBD56F-BC4C-B37D-45BA-F92FB11AEA3C}.Dist|x64.ActiveCfg = Dist|x64
+		{50EBD56F-BC4C-B37D-45BA-F92FB11AEA3C}.Dist|x64.Build.0 = Dist|x64
+		{50EBD56F-BC4C-B37D-45BA-F92FB11AEA3C}.Release|x64.ActiveCfg = Release|x64
+		{50EBD56F-BC4C-B37D-45BA-F92FB11AEA3C}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{50EBD56F-BC4C-B37D-45BA-F92FB11AEA3C} = {DB74F67E-47DF-AAF5-901D-5C9BFCC6884A}
+	EndGlobalSection
+EndGlobal

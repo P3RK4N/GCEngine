@@ -77,7 +77,9 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="..\..\GCEditor\libs\mono\tools\checker\premake5.lua" />
     <None Include="..\..\GCEditor\premake5.lua" />
+    <None Include="..\..\GCEngine-ScriptCore\premake5.lua" />
     <None Include="..\..\GCEngine\premake5.lua" />
     <None Include="..\..\GCEngine\vendor\Box2D\premake5.lua" />
     <None Include="..\..\GCEngine\vendor\GLFW\premake5.lua" />

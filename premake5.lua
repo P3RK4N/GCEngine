@@ -19,9 +19,15 @@ group "Dependencies"
     include "GCEngine/vendor/Box2D"
 group ""
 
-include "GCEngine"
-include "Sandbox"
-include "GCEditor"
+group "Core"
+    include "GCEngine"
+    include "GCEngine-ScriptCore"
+group ""
+    
+group "Tools"
+    include "GCEditor"
+group ""
 
-
-
+group "Misc"
+    include "Sandbox"
+group ""

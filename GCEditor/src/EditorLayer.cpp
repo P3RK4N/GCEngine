@@ -13,35 +13,6 @@
 
 namespace GCE
 {
-	class CameraController : public ScriptableEntity
-	{
-	public:
-		void onCreate()
-		{
-
-		}
-
-		void onDestroy()
-		{
-
-		}
-
-		void onUpdate(Timestep ts)
-		{
-			auto& transform = getComponent<TransformComponent>();
-			float speed = 5.0f;
-
-			if (Input::isKeyPressed(GCE_KEY_A))
-				transform.translation[0] -= speed * ts;
-			if (Input::isKeyPressed(GCE_KEY_D))
-				transform.translation[0] += speed * ts;
-			if (Input::isKeyPressed(GCE_KEY_S))
-				transform.translation[1] -= speed * ts;
-			if (Input::isKeyPressed(GCE_KEY_W))
-				transform.translation[1] += speed * ts;
-		}
-	};
-
 	extern const std::filesystem::path g_AssetPath = "assets";
 
 	EditorLayer::EditorLayer() :
@@ -56,6 +27,8 @@ namespace GCE
 
 		m_IconPlay = Texture2D::create("resources/icons/Play.png");
 		m_IconStop = Texture2D::create("resources/icons/Stop.png");
+		m_IconSimulate = Texture2D::create("resources/icons/Simulate.png");
+
 
 		FrameBufferSpecification spec;
 		spec.width = 1280;
@@ -64,10 +37,11 @@ namespace GCE
 
 		m_FrameBuffer = FrameBuffer::create(spec);
 		m_ActiveScene = createRef<Scene>();
+		m_EditorScene = m_ActiveScene;
 		m_EditorCamera = EditorCamera(45.0f, 1.778f, 0.01f, 1000.0f);
 		m_SceneHierarchyPanel.setContext(m_ActiveScene);
 
-		auto commandLineArgs = Application::get()->getCommandLineArgs();
+		auto commandLineArgs = Application::get()->getSpecification().commandLineArgs;
 		if (commandLineArgs.count > 1)
 		{
 			auto sceneFilePath = commandLineArgs[1];
@@ -108,19 +82,23 @@ namespace GCE
 		switch (m_SceneState)
 		{
 			case SceneState::Edit:
-				{
-					if ((m_ViewportFocused || m_ViewportHovered) && !ImGuizmo::IsUsing())
-					{
-						m_EditorCamera.onUpdate(ts);
-					}
-					m_ActiveScene->onUpdateEditor(ts, m_EditorCamera);
-					break;
-				}
+			{
+				if ((m_ViewportFocused || m_ViewportHovered) && !ImGuizmo::IsUsing())
+					m_EditorCamera.onUpdate(ts);
+				m_ActiveScene->onUpdateEditor(ts, m_EditorCamera);
+				break;
+			}
 			case SceneState::Play:
-				{
-					m_ActiveScene->onUpdateRuntime(ts);
-					break;
-				}
+			{
+				m_ActiveScene->onUpdateRuntime(ts);
+				break;
+			}
+			case SceneState::Simulate:
+			{
+				if ((m_ViewportFocused || m_ViewportHovered) && !ImGuizmo::IsUsing())
+					m_EditorCamera.onUpdate(ts);
+				m_ActiveScene->onUpdateSimulation(ts, m_EditorCamera);
+			}
 		}
 
 
@@ -152,7 +130,8 @@ namespace GCE
 		if (m_SceneState == SceneState::Play)
 		{
 			Entity camera = m_ActiveScene->getPrimaryCamera();
-			
+			if (!camera)
+				return;
 			Renderer2D::beginScene(camera.getComponent<CameraComponent>().camera, camera.getComponent<TransformComponent>().getTransform());
 		}
 		else
@@ -300,18 +279,39 @@ namespace GCE
 
 		ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
+		bool toolbarEnabled = (bool)m_ActiveScene;
+		ImVec4 tintColor = ImVec4(1, 1, 1, 1);
+		if(!toolbarEnabled)
+			tintColor.w = 0.5f;
+
 		float size = ImGui::GetWindowHeight() - 4.0f;
-		Ref<Texture2D> icon = m_SceneState == SceneState::Edit ? m_IconPlay : m_IconStop;
 
-		ImGui::SameLine((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
-
-		if (ImGui::ImageButton((ImTextureID)icon->getRendererID(), ImVec2{ size, size }, ImVec2(0, 0), ImVec2(1, 1), 0))
 		{
-			if (m_SceneState == SceneState::Edit)
-				onScenePlay();
-			else if (m_SceneState == SceneState::Play)
-				onSceneStop();
+			Ref<Texture2D> icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate) ? m_IconPlay : m_IconStop;
+			ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+			if (ImGui::ImageButton((ImTextureID)icon->getRendererID(), ImVec2{ size, size }, ImVec2(0, 0), ImVec2(1, 1), 0))
+			{
+				if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate)
+					onScenePlay();
+				else if (m_SceneState == SceneState::Play)
+					onSceneStop();
+			}
 		}
+
+		//ImGui::SameLine((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+		ImGui::SameLine();
+
+		{
+			Ref<Texture2D> icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play) ? m_IconSimulate : m_IconStop;		//ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+			if (ImGui::ImageButton((ImTextureID)icon->getRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
+			{
+				if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play)
+					onSceneSimulate();
+				else if (m_SceneState == SceneState::Simulate)
+					onSceneStop();
+			}
+		}
+
 		ImGui::PopStyleVar(2);
 		ImGui::PopStyleColor(3);
 		ImGui::End();
@@ -331,22 +331,22 @@ namespace GCE
 		if(e.getRepeatCount() > 0)
 			return false;
 
-		bool control = Input::isKeyPressed(GCE_KEY_LEFT_CONTROL) || Input::isKeyPressed(GCE_KEY_RIGHT_CONTROL);
-		bool shift = Input::isKeyPressed(GCE_KEY_LEFT_SHIFT) || Input::isKeyPressed(GCE_KEY_LEFT_SHIFT);
+		bool control = Input::isKeyPressed(Key::LeftControl) || Input::isKeyPressed(Key::RightControl);
+		bool shift = Input::isKeyPressed(Key::LeftShift) || Input::isKeyPressed(Key::RightShift);
 
 		switch (e.getKeyCode())
 		{
-			case GCE_KEY_N:
+			case Key::N:
 				if(control)
 					newScene();
 				break;
 
-			case GCE_KEY_O:
+			case Key::O:
 				if(control)
 					openScene();
 				break;
 
-			case GCE_KEY_S:
+			case Key::S:
 				if(control && shift)
 					saveSceneAs();
 				else if (control)
@@ -354,22 +354,22 @@ namespace GCE
 				break;
 
 
-			case GCE_KEY_D:
+			case Key::D:
 				if (control)
 					onDuplicateEntity();
 					break;
 
 			//Gizmos
-			case GCE_KEY_Q:
+			case Key::Q:
 				m_GizmoType = -1;
 				break;
-			case GCE_KEY_W:
+			case Key::W:
 				m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
 				break;
-			case GCE_KEY_E:
+			case Key::E:
 				m_GizmoType = ImGuizmo::OPERATION::ROTATE;
 				break;
-			case GCE_KEY_R:
+			case Key::R:
 				m_GizmoType = ImGuizmo::OPERATION::SCALE;
 				break;
 		}
@@ -377,7 +377,7 @@ namespace GCE
 
 	bool EditorLayer::onMouseButtonPressed(MouseButtonPressedEvent& e)
 	{
-		if (e.getMouseButton() == GCE_MOUSE_BUTTON_LEFT && (!ImGuizmo::IsOver() || !m_SceneHierarchyPanel.getSelectedEntity()) && !Input::isKeyPressed(GCE_KEY_LEFT_ALT))
+		if (e.getMouseButton() == Mouse::ButtonLeft && (!ImGuizmo::IsOver() || !m_SceneHierarchyPanel.getSelectedEntity()) && !Input::isKeyPressed(Key::LeftAlt))
 		{
 			if (m_ViewportHovered)
 				m_SceneHierarchyPanel.setSelectedEntity(m_HoveredEntity);
@@ -537,7 +537,7 @@ namespace GCE
 			glm::mat4 transform = entityTransformComponent.getTransform();
 
 			//Snapping
-			bool snap = Input::isKeyPressed(GCE_KEY_LEFT_CONTROL);
+			bool snap = Input::isKeyPressed(Key::LeftControl);
 			float snapValue = 0.5f;
 			if (m_GizmoType == ImGuizmo::OPERATION::ROTATE)
 				snapValue = 45.0f;
@@ -563,6 +563,9 @@ namespace GCE
 
 	void EditorLayer::onScenePlay()
 	{
+		if (m_SceneState == SceneState::Simulate)
+			onSceneStop();
+
 		m_SceneState = SceneState::Play;
 
 		m_ActiveScene = Scene::copy(m_EditorScene);
@@ -570,14 +573,29 @@ namespace GCE
 		m_ActiveScene->onRuntimeStart();
 	}
 
+	void EditorLayer::onSceneSimulate()
+	{
+		if(m_SceneState == SceneState::Play)
+			onSceneStop();
+
+		m_SceneState = SceneState::Simulate;
+
+		m_ActiveScene = Scene::copy(m_EditorScene);
+		m_SceneHierarchyPanel.setContext(m_ActiveScene);
+		m_ActiveScene->onSimulationStart();
+	}
+
 	void EditorLayer::onSceneStop()
 	{
+		if (m_SceneState == SceneState::Play)
+			m_ActiveScene->onRuntimeStop();
+		else if (m_SceneState == SceneState::Simulate)
+			m_ActiveScene->onSimulationStop();
+
 		m_SceneState = SceneState::Edit;
-		m_ActiveScene->onRuntimeStop();
 
 		m_ActiveScene = m_EditorScene;
 		m_SceneHierarchyPanel.setContext(m_ActiveScene);
-		m_ActiveScene->onViewportResize((unsigned int)m_ViewportSize.x, (unsigned int)m_ViewportSize.y);
 	}
 
 	void EditorLayer::onDuplicateEntity()

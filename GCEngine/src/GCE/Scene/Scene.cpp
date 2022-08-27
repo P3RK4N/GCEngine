@@ -4,6 +4,7 @@
 #include "GCE/Scene/Entity.h"
 #include "GCE/Scene/Components.h"
 #include "GCE/Scene/ScriptableEntity.h"
+#include "GCE/Scripting/ScriptEngine.h"
 #include "GCE/Renderer/Renderer2D.h"
 
 #include <glm/glm.hpp>
@@ -89,6 +90,7 @@ namespace GCE
 		copyComponent<Rigidbody2DComponent>(srcSceneRegistry, dstSceneRegistry, enttMap);
 		copyComponent<BoxCollider2DComponent>(srcSceneRegistry, dstSceneRegistry, enttMap);
 		copyComponent<CircleCollider2DComponent>(srcSceneRegistry, dstSceneRegistry, enttMap);
+		copyComponent<ScriptComponent>(srcSceneRegistry, dstSceneRegistry, enttMap);
 
 		return newScene;
 	}
@@ -106,54 +108,45 @@ namespace GCE
 		entity.addComponent<TransformComponent>();
 		entity.addComponent<TagComponent>(name.empty() ? "Entity" : name);
 
+		m_EntityMap[(uint64_t)uuid] = entity;
+
 		return entity;
 	}
 
 	void Scene::destroyEntity(Entity entity)
 	{
 		m_Registry.destroy(entity);
+		m_EntityMap.erase((uint64_t)entity.getUUID());
 	}
 
-	void Scene::onUpdateEditor(Timestep ts, EditorCamera& camera)
+	void Scene::onUpdateEditor(Timestep ts, const EditorCamera& camera)
 	{
-		Renderer2D::beginScene(camera);
-
-		{
-			auto spriteView = m_Registry.view<TransformComponent, SpriteRendererComponent>();
-			for (auto entity : spriteView)
-			{
-				auto [transform, sprite] = spriteView.get<TransformComponent, SpriteRendererComponent>(entity);
-				Renderer2D::drawSprite(transform.getTransform(), sprite, (int)entity);
-			}
-		}
-
-		{
-			auto circleView = m_Registry.view<TransformComponent, CircleRendererComponent>();
-			for (auto entity : circleView)
-			{
-				auto [transform, circle] = circleView.get<TransformComponent, CircleRendererComponent>(entity);
-				Renderer2D::drawCircle(transform.getTransform(), circle.color, circle.thickness, circle.fade, (uint32_t)entity);
-			}
-		}
-
-		Renderer2D::endScene();
+		renderScene(camera);
 	}
 
 	void Scene::onUpdateRuntime(Timestep ts)
 	{
 		//SCRIPTS
-		m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
 		{
-			if (!nsc.instance)
+			auto view = m_Registry.view<ScriptComponent>();
+			for (auto e : view)
 			{
-				nsc.instance = nsc.instantiateScript();
-				nsc.instance->m_Entity = Entity{ entity, this };
-				nsc.instance->onCreate();
+				Entity entity = { e, this };
+				ScriptEngine::onUpdateEntity(entity, ts);
 			}
 
-			nsc.instance->onUpdate(ts);
-		});
+			m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
+			{
+				if (!nsc.instance)
+				{
+					nsc.instance = nsc.instantiateScript();
+					nsc.instance->m_Entity = Entity{ entity, this };
+					nsc.instance->onCreate();
+				}
 
+				nsc.instance->onUpdate(ts);
+			});
+		}
 		//PHYSICS
 		{
 			const int velocityIterations = 6;
@@ -215,6 +208,59 @@ namespace GCE
 		}
 	}
 
+	void Scene::onUpdateSimulation(Timestep ts, const EditorCamera& camera)
+	{
+		//PHYSICS
+		{
+			const int velocityIterations = 6;
+			const int positionIterations = 2;
+			m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
+
+			auto view = m_Registry.view<Rigidbody2DComponent>();
+			for (auto& e : view)
+			{
+				Entity entity = { e, this };
+				auto& transform = entity.getComponent<TransformComponent>();
+				auto& rb2d = entity.getComponent<Rigidbody2DComponent>();
+
+				b2Body* body = (b2Body*)rb2d.runtimeBody;
+				const auto& position = body->GetPosition();
+
+				transform.translation.x = position.x;
+				transform.translation.y = position.y;
+				transform.rotation.z = body->GetAngle();
+
+			}
+		};
+
+		renderScene(camera);
+	}
+
+	void Scene::renderScene(const EditorCamera& camera)
+	{
+		Renderer2D::beginScene(camera);
+
+		{
+			auto spriteView = m_Registry.view<TransformComponent, SpriteRendererComponent>();
+			for (auto entity : spriteView)
+			{
+				auto [transform, sprite] = spriteView.get<TransformComponent, SpriteRendererComponent>(entity);
+				Renderer2D::drawSprite(transform.getTransform(), sprite, (int)entity);
+			}
+		}
+
+		{
+			auto circleView = m_Registry.view<TransformComponent, CircleRendererComponent>();
+			for (auto entity : circleView)
+			{
+				auto [transform, circle] = circleView.get<TransformComponent, CircleRendererComponent>(entity);
+				Renderer2D::drawCircle(transform.getTransform(), circle.color, circle.thickness, circle.fade, (uint32_t)entity);
+			}
+		}
+
+		Renderer2D::endScene();
+	}
+
 	void Scene::onViewportResize(unsigned int width, unsigned int height)
 	{
 		m_ViewportWidth = width;
@@ -227,12 +273,6 @@ namespace GCE
 			if (!cc.fixedAspectRatio)
 				cc.camera.setViewportSize(width, height);
 		}
-	}
-
-	void Scene::resetCameraComponent(CameraComponent& cameraComponent)
-	{
-		if (!cameraComponent.fixedAspectRatio)
-				cameraComponent.camera.setViewportSize(m_ViewportWidth, m_ViewportHeight);
 	}
 
 	void Scene::duplicateEntity(Entity entity)
@@ -248,6 +288,7 @@ namespace GCE
 		copyComponentIfExists<Rigidbody2DComponent>(entity, newEntity);
 		copyComponentIfExists<BoxCollider2DComponent>(entity, newEntity);
 		copyComponentIfExists<CircleCollider2DComponent>(entity, newEntity);
+		copyComponentIfExists<ScriptComponent>(entity, newEntity);
 	}
 
 	Entity Scene::getPrimaryCamera()
@@ -263,6 +304,39 @@ namespace GCE
 	}
 
 	void Scene::onRuntimeStart()
+	{
+		onPhysics2DStart();
+
+		{
+			ScriptEngine::onRuntimeStart(this);
+
+			auto view = m_Registry.view<ScriptComponent>();
+			for (auto e : view)
+			{
+				Entity entity = { e, this };
+				ScriptEngine::onCreateEntity(entity);
+			}
+		}
+	}
+
+	void Scene::onRuntimeStop()
+	{
+		onPhysics2DStop();
+
+		ScriptEngine::onRuntimeStop();
+	}
+
+	void Scene::onSimulationStart()
+	{
+		onPhysics2DStart();
+	}
+
+	void Scene::onSimulationStop()
+	{
+		onPhysics2DStop();
+	}
+
+	void Scene::onPhysics2DStart()
 	{
 		m_PhysicsWorld = new b2World({ 0.0f, -9.81f });
 		auto view = m_Registry.view<Rigidbody2DComponent>();
@@ -318,15 +392,20 @@ namespace GCE
 				body->CreateFixture(&fixtureDef);
 			}
 		}
-
 	}
 
-	void Scene::onRuntimeStop()
+	void Scene::onPhysics2DStop()
 	{
 		delete m_PhysicsWorld;
 		m_PhysicsWorld = nullptr;
 	}
 
+	Entity Scene::getEntityByUUID(UUID uuid)
+	{
+		if (m_EntityMap.find((uint64_t)uuid) != m_EntityMap.end())
+			return { m_EntityMap.at((uint64_t)uuid), this };
+		return {};
+	}
 
 	template<typename T>
 	void Scene::onComponentAdded(Entity, T& component)
@@ -376,6 +455,12 @@ namespace GCE
 	{
 
 	}
+
+	template<>
+	void Scene::onComponentAdded<ScriptComponent>(Entity entity, ScriptComponent& component)
+	{
+		
+	}
 	
 	template<>
 	void Scene::onComponentAdded<Rigidbody2DComponent>(Entity entity, Rigidbody2DComponent& component)
@@ -394,4 +479,5 @@ namespace GCE
 	{
 
 	}
+
 }

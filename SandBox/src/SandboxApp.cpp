@@ -6,7 +6,8 @@
 class SandBox : public GCE::Application
 {
 public:
-	SandBox()
+	SandBox(const ApplicationSpecification& specification)
+		: Application(specification)
 	{
 		//pushLayer(new ExampleLayer());
 		pushLayer(new Sandbox2D());
@@ -18,7 +19,12 @@ public:
 	}
 };
 
-GCE::Application* GCE::createApplication()
+GCE::Application* GCE::createApplication(GCE::ApplicationCommandLineArgs args)
 {
-	return new SandBox();
+	ApplicationSpecification spec;
+	spec.name = "Sandbox";
+	spec.workingDirectory = "../GCEditor";
+	spec.commandLineArgs = args;
+
+	return new SandBox(spec);
 }

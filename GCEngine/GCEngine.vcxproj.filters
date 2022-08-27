@@ -28,6 +28,9 @@
     <Filter Include="src\GCE\Scene">
       <UniqueIdentifier>{C8C7BF88-3488-3BBF-FDC2-843C6942809B}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\GCE\Scripting">
+      <UniqueIdentifier>{2D2D82CD-9943-8063-E2BA-0B854E1051EB}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\GCE\Utils">
       <UniqueIdentifier>{0B5CED88-771C-69BF-4057-B23CACD6AD9B}</UniqueIdentifier>
     </Filter>
@@ -109,6 +112,9 @@
       <Filter>src\GCE\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\GCE\Core\Timestep.h">
+      <Filter>src\GCE\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GCE\Core\UUID.h">
       <Filter>src\GCE\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\GCE\Core\Window.h">
@@ -200,6 +206,12 @@
     </ClInclude>
     <ClInclude Include="src\GCE\Scene\ScriptableEntity.h">
       <Filter>src\GCE\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GCE\Scripting\ScriptEngine.h">
+      <Filter>src\GCE\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GCE\Scripting\ScriptGlue.h">
+      <Filter>src\GCE\Scripting</Filter>
     </ClInclude>
     <ClInclude Include="src\GCE\Utils\PlatformUtils.h">
       <Filter>src\GCE\Utils</Filter>
@@ -1485,7 +1497,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\GCE\Core\UUID.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GCE\Core\Application.cpp">
@@ -1498,6 +1509,9 @@
       <Filter>src\GCE\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\GCE\Core\Log.cpp">
+      <Filter>src\GCE\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GCE\Core\UUID.cpp">
       <Filter>src\GCE\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\GCE\ImGui\ImGuiBuild.cpp">
@@ -1563,6 +1577,12 @@
     <ClCompile Include="src\GCE\Scene\SceneSerializer.cpp">
       <Filter>src\GCE\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="src\GCE\Scripting\ScriptEngine.cpp">
+      <Filter>src\GCE\Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GCE\Scripting\ScriptGlue.cpp">
+      <Filter>src\GCE\Scripting</Filter>
+    </ClCompile>
     <ClCompile Include="src\GCEPCH.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -1605,6 +1625,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\GCE\Core\UUID.cpp" />
   </ItemGroup>
 </Project>

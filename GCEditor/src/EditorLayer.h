@@ -39,6 +39,7 @@ namespace GCE
 		void serializeScene(const Ref<Scene>& scene, const std::filesystem::path& filePath);
 
 		void onScenePlay();
+		void onSceneSimulate();
 		void onSceneStop();
 
 		void onDuplicateEntity();
@@ -72,10 +73,10 @@ namespace GCE
 
 		enum class SceneState
 		{
-			Edit = 0, Play = 1
+			Edit = 0, Play = 1, Simulate = 2
 		};
 
-		Ref<Texture2D> m_IconPlay, m_IconStop;
+		Ref<Texture2D> m_IconPlay, m_IconStop, m_IconSimulate;
 
 		SceneState m_SceneState = SceneState::Edit;
 	};

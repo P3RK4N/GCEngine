@@ -17,6 +17,11 @@ namespace GCE
 
 	}
 
+	void Renderer::shutdown()
+	{
+		Renderer2D::shutdown();
+	}
+
 	void Renderer::init()
 	{
 		GCE_PROFILE_FUNCTION();

@@ -7,6 +7,18 @@
     <Filter Include="..\GCEditor">
       <UniqueIdentifier>{6133D252-CDE8-4A48-56DD-441FC291414C}</UniqueIdentifier>
     </Filter>
+    <Filter Include="..\GCEditor\libs">
+      <UniqueIdentifier>{5AFCFDC2-46F5-1C15-6F27-029A5B7FFC20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\GCEditor\libs\mono">
+      <UniqueIdentifier>{62F09BD2-CE5C-57CD-9750-EF2A037C7935}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\GCEditor\libs\mono\tools">
+      <UniqueIdentifier>{8286AFA1-EE93-DD87-777A-D972E386A93E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\GCEditor\libs\mono\tools\checker">
+      <UniqueIdentifier>{E6C6D649-5280-41F4-DBDF-5BCE4798F763}</UniqueIdentifier>
+    </Filter>
     <Filter Include="..\GCEngine">
       <UniqueIdentifier>{B0E08553-1C96-FE48-A58A-F81F113FF54C}</UniqueIdentifier>
     </Filter>
@@ -28,13 +40,22 @@
     <Filter Include="..\GCEngine\vendor\yaml-cpp">
       <UniqueIdentifier>{5FB6AA52-CBC3-D838-54AA-D423C0B6A4EF}</UniqueIdentifier>
     </Filter>
+    <Filter Include="..\GCEngine-ScriptCore">
+      <UniqueIdentifier>{1BEDD131-07E7-FA83-F053-9194DCEC60F0}</UniqueIdentifier>
+    </Filter>
     <Filter Include="..\SandBox">
       <UniqueIdentifier>{1FF36A1D-0BAB-AC6A-74B2-85C66089475B}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\GCEditor\libs\mono\tools\checker\premake5.lua">
+      <Filter>..\GCEditor\libs\mono\tools\checker</Filter>
+    </None>
     <None Include="..\..\GCEditor\premake5.lua">
       <Filter>..\GCEditor</Filter>
+    </None>
+    <None Include="..\..\GCEngine-ScriptCore\premake5.lua">
+      <Filter>..\GCEngine-ScriptCore</Filter>
     </None>
     <None Include="..\..\GCEngine\premake5.lua">
       <Filter>..\GCEngine</Filter>

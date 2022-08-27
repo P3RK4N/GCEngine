@@ -1,6 +1,7 @@
 #include "SceneHierarchyPanel.h"
 
 #include <GCE/Scene/Components.h>
+#include <GCE/Scripting/ScriptEngine.h>
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -304,6 +305,14 @@ namespace GCE
 					ImGui::CloseCurrentPopup();
 				}
 			}
+			if(!m_SelectionContext.hasComponent<ScriptComponent>())
+			{
+				if (ImGui::MenuItem("Script Component"))
+				{
+					m_SelectionContext.addComponent<ScriptComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
 
 			ImGui::EndPopup();
 		}
@@ -363,7 +372,8 @@ namespace GCE
 						camera.setOrthographicFarClip(farClip);
 
 					if (ImGui::Checkbox("Fixed Aspect Ratio", &component.fixedAspectRatio))
-						m_Context->resetCameraComponent(component);
+						if (!component.fixedAspectRatio)
+							camera.setViewportSize(m_Context->getViewportWidth(), m_Context->getViewportHeight());
 				}
 
 				if (camera.getProjectionType() == SceneCamera::ProjectionType::Perspective)
@@ -452,6 +462,23 @@ namespace GCE
 			ImGui::DragFloat("Friction", &component.friction, 0.01f, 0.0f, 1.0f);
 			ImGui::DragFloat("Restitution", &component.restitution, 0.01f, 0.0f, 1.0f);
 			ImGui::DragFloat("Restitution Threshold", &component.restitutionThreshold, 0.01f, 0.0f);
+		});
+
+		drawComponent<ScriptComponent>("Script Component", entity, [](auto& component)
+		{
+			bool scriptClassExists = ScriptEngine::entityClassExists(component.className);
+
+			static char buffer[64];
+			strcpy(buffer, component.className.c_str());
+
+			if (!scriptClassExists)
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f));
+
+			if (ImGui::InputText("Class", buffer, sizeof(buffer)))
+				component.className = buffer;
+
+			if (!scriptClassExists)
+				ImGui::PopStyleColor();
 		});
 	}
 

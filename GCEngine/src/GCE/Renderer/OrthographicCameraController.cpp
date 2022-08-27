@@ -20,21 +20,21 @@ namespace GCE
 		GCE_PROFILE_FUNCTION();
 
 		//POSITION
-		if (Input::isKeyPressed(GCE_KEY_A))
+		if (Input::isKeyPressed(Key::A))
 			m_Camera.setPosition(m_Camera.getPosition() - glm::vec3(m_CameraMoveSpeed * ts * m_ZoomLevel, 0.0f, 0.0f));
-		if (Input::isKeyPressed(GCE_KEY_D))
+		if (Input::isKeyPressed(Key::D))
 			m_Camera.setPosition(m_Camera.getPosition() + glm::vec3(m_CameraMoveSpeed * ts * m_ZoomLevel, 0.0f, 0.0f));
-		if (Input::isKeyPressed(GCE_KEY_S))
+		if (Input::isKeyPressed(Key::S))
 			m_Camera.setPosition(m_Camera.getPosition() - glm::vec3(0.0f, m_CameraMoveSpeed * ts * m_ZoomLevel, 0.0f));
-		if (Input::isKeyPressed(GCE_KEY_W))
+		if (Input::isKeyPressed(Key::W))
 			m_Camera.setPosition(m_Camera.getPosition() + glm::vec3(0.0f, m_CameraMoveSpeed * ts * m_ZoomLevel, 0.0f));
 
 		//ROTATION
 		if (m_Rotation)
 		{
-			if (Input::isKeyPressed(GCE_KEY_Q))
+			if (Input::isKeyPressed(Key::Q))
 				m_Camera.setRotation(m_Camera.getRotation() + m_CameraRotateSpeed * ts);
-			if (Input::isKeyPressed(GCE_KEY_E))
+			if (Input::isKeyPressed(Key::E))
 				m_Camera.setRotation(m_Camera.getRotation() - m_CameraRotateSpeed * ts);
 		}
 	} 

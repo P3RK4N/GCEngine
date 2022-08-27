@@ -105,6 +105,14 @@ namespace GCE
 		NativeScriptComponent(const NativeScriptComponent&) = default;
 	};
 
+	struct ScriptComponent
+	{
+		std::string className;
+
+		ScriptComponent() = default;
+		ScriptComponent(const ScriptComponent&) = default;
+	};
+
 	//Physics
 	struct Rigidbody2DComponent
 	{
@@ -149,4 +157,14 @@ namespace GCE
 		CircleCollider2DComponent() = default;
 		CircleCollider2DComponent(const CircleCollider2DComponent&) = default;
 	};
+
+
+	template<typename... Component>
+	struct ComponentGroup
+	{
+
+	};
+
+	using AllComponents = ComponentGroup<TransformComponent, SpriteRendererComponent, CircleRendererComponent, CameraComponent, NativeScriptComponent, Rigidbody2DComponent, BoxCollider2DComponent, CircleCollider2DComponent, CircleRendererComponent, CameraComponent, ScriptComponent, NativeScriptComponent, Rigidbody2DComponent, BoxCollider2DComponent, CircleCollider2DComponent>;
 }
+

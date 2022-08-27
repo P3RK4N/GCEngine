@@ -238,6 +238,11 @@ namespace GCE
 			out << YAML::Key << "RestitutionThreshold" << YAML::Value << component.restitutionThreshold;
 		});
 
+		serializeComponent<ScriptComponent>("ScriptComponent", out, entity, [](YAML::Emitter& out, const ScriptComponent& component)
+		{
+			out << YAML::Key << "ClassName" << YAML::Value << component.className;
+		});
+
 		out << YAML::EndMap; //Entity
 	}
 
@@ -377,6 +382,13 @@ namespace GCE
 					cc2dc.friction = circleCollider2DComponent["Friction"].as<float>();
 					cc2dc.restitution = circleCollider2DComponent["Restitution"].as<float>();
 					cc2dc.restitutionThreshold = circleCollider2DComponent["RestitutionThreshold"].as<float>();
+				}
+
+				auto scriptComponent = entity["ScriptComponent"];
+				if (scriptComponent)
+				{
+					auto& sc = deserializedEntity.addComponent<ScriptComponent>();
+					sc.className = scriptComponent["ClassName"].as<std::string>();
 				}
 			}
 		}

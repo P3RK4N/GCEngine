@@ -24,17 +24,17 @@ namespace GCE
 
 	void EditorCamera::onUpdate(Timestep ts)
 	{
-		if(Input::isKeyPressed(GCE_KEY_LEFT_ALT))
+		if(Input::isKeyPressed(Key::LeftAlt))
 		{
 			const glm::vec2& mouse{ Input::getMouseX(), Input::getMouseY() };
 			glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
 			m_InitialMousePosition = mouse;
 
-			if (Input::isMouseButtonPressed(GCE_MOUSE_BUTTON_MIDDLE))
+			if (Input::isMouseButtonPressed(Mouse::ButtonMiddle))
 				mousePan(delta);
-			else if (Input::isMouseButtonPressed(GCE_MOUSE_BUTTON_LEFT))
+			else if (Input::isMouseButtonPressed(Mouse::ButtonLeft))
 				mouseRotate(delta);
-			else if (Input::isMouseButtonPressed(GCE_MOUSE_BUTTON_RIGHT))
+			else if (Input::isMouseButtonPressed(Mouse::ButtonRight))
 				mouseZoom(delta.y);
 		}
 

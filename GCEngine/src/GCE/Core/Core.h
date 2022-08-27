@@ -1,5 +1,4 @@
 #pragma once
-
 #include <memory>
 #include "GCE/Core/PlatformDetection.h"
 
@@ -47,8 +46,8 @@
 #endif
 
 
-#define HZ_EXPAND_MACRO(x) x
-#define HZ_STRINGIFY_MACRO(x) #x
+#define GCE_EXPAND_MACRO(x) x
+#define GCE_STRINGIFY_MACRO(x) #x
 #define BIT(x) (1 << x)
 #define GCE_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1) 
 

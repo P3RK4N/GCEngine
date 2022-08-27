@@ -25,10 +25,18 @@ namespace GCE
 		}
 	};
 
+	struct ApplicationSpecification
+	{
+		std::string name = "Gigachad Engine";
+		std::string workingDirectory;
+
+		ApplicationCommandLineArgs commandLineArgs;
+	};
+
 	class GCE_API Application
 	{
 	public:
-		Application(const std::string& name = "GCEngine", ApplicationCommandLineArgs args = ApplicationCommandLineArgs());
+		Application(const ApplicationSpecification& specification);
 		virtual ~Application();
 
 		void Run();
@@ -45,13 +53,15 @@ namespace GCE
 	public:
 		inline static Application* get() { return s_Instance; }
 
-		ApplicationCommandLineArgs getCommandLineArgs() const { return m_CommandLineArgs; }
+		const ApplicationSpecification& getSpecification() const { return m_Specification; }
 
 	private:
 		bool onWindowClose(WindowCloseEvent& e);
 		bool onWindowResize(WindowResizeEvent& e);
 
 	private:
+		ApplicationSpecification m_Specification;
+
 		ApplicationCommandLineArgs m_CommandLineArgs;
 		Scope<Window> m_Window;
 

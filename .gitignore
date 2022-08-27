@@ -3,3 +3,14 @@
 .vs/
 bin-int/
 bin/
+Intermediates/
+
+*.log
+**.vcxproj
+**.vcxproj.filters
+**.vcxproj.user
+**.csproj
+
+Hazel/vendor/VulkanSDK
+Hazelnut/assets/cache
+scripts/__pycache__

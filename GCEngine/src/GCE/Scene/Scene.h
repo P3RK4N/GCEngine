@@ -28,13 +28,18 @@ namespace GCE
 		void onRuntimeStart();
 		void onRuntimeStop();
 
-		void onUpdateEditor(Timestep ts, EditorCamera& camera);
+		void onSimulationStart();
+		void onSimulationStop();
+
+		void onUpdateEditor(Timestep ts, const EditorCamera& camera);
 		void onUpdateRuntime(Timestep ts);
+		void onUpdateSimulation(Timestep ts, const EditorCamera& camera);
 		void onViewportResize(unsigned int width, unsigned int height);
 
 		void duplicateEntity(Entity entity);
 
 		Entity getPrimaryCamera();
+		Entity getEntityByUUID(UUID uuid);
 
 		template<typename... Components>
 		auto getAllEntitiesWith()
@@ -42,14 +47,21 @@ namespace GCE
 			return m_Registry.view<Components...>();
 		}
 
-	private:
-		void resetCameraComponent(CameraComponent& cameraComponent);
+		const unsigned int& getViewportWidth() { return m_ViewportWidth; }
+		const unsigned int& getViewportHeight() { return m_ViewportHeight; }
 
+	private:
 		template<typename T>
 		void onComponentAdded(Entity entity, T& component);
 
+		void onPhysics2DStart();
+		void onPhysics2DStop();
+
+		void renderScene(const EditorCamera& camera);
+
 	private:
 		entt::registry m_Registry;
+		std::unordered_map<uint64_t, entt::entity> m_EntityMap;
 
 		unsigned int m_ViewportWidth;
 		unsigned int m_ViewportHeight;
