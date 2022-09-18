@@ -1,0 +1,24 @@
+Scene: Untitled
+Entities:
+  - Entity: 8051255497688541405
+    TagComponent:
+      Tag: Circle
+    TransformComponent:
+      Position: [2.87186623, -2.00447893, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CircleRendererComponent:
+      Color: [0.768339753, 0.163160935, 0.163160935, 1]
+      Thickness: 0.300000012
+      Fade: 0.00499999989
+  - Entity: 13980955378068928143
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Position: [-2.70000005, 2.20000005, 0]
+      Rotation: [-0.0157079622, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0.501930475, 0.112401418, 0.112401418, 1]
+      Texture: ""
+      TextureScale: 1
