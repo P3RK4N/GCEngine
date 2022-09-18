@@ -1,6 +1,20 @@
 # GCEngine
 Graphics engine oriented mostly on game development
 
+Dependencies:
+- premake5 - used for project setup
+- GLFW - used for window and input
+- imgui - used for GUI
+- imguizmo - used for scene overlays
+- spdlog - used for logging
+- yaml-cpp - used for serializtion
+- stb_image - used for loading images
+- glm - used for linear algebra
+- glad - OpenGL loader
+- entt - used for entity component system
+- box2D - used for 2D physics
+- mono - used for C# scripting
+
 
 Serialization with yaml
 
