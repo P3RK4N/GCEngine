@@ -22,7 +22,7 @@ Serialization with yaml (webm)
 [Serialization.webm](https://user-images.githubusercontent.com/87949029/190928550-e42494c3-6cde-46d1-a8dc-f924d07a7c35.webm)
 
 
-Integrated Box2D - Phtsics overview (mp4)
+Integrated Box2D - Physics overview (mp4)
 
 https://user-images.githubusercontent.com/87949029/190928397-36210b90-9c88-4cf1-922c-464e114715cd.mp4
 
